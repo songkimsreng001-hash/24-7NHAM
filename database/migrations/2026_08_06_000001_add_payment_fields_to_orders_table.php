@@ -17,11 +17,11 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             // Status: 0 = rejected, 1 = approved, 2 = paid/pending fulfillment
-            if (!Schema::hasColumn('orders', 'status')) {
+            if (! Schema::hasColumn('orders', 'status')) {
                 $table->tinyInteger('status')->default(2)->after('amount');
             }
 
-            if (!Schema::hasColumn('orders', 'payment_intent_id')) {
+            if (! Schema::hasColumn('orders', 'payment_intent_id')) {
                 $table->string('payment_intent_id')->nullable()->after('status');
             }
         });

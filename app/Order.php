@@ -9,7 +9,8 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $table      = 'orders';
+    protected $table = 'orders';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -21,16 +22,18 @@ class Order extends Model
 
     // Status constants
     const STATUS_REJECTED = 0;
+
     const STATUS_APPROVED = 1;
-    const STATUS_PAID     = 2;
+
+    const STATUS_PAID = 2;
 
     public function statusLabel(): string
     {
         return match ($this->status) {
             self::STATUS_APPROVED => 'Approved',
             self::STATUS_REJECTED => 'Rejected',
-            self::STATUS_PAID     => 'Paid',
-            default               => 'Unknown',
+            self::STATUS_PAID => 'Paid',
+            default => 'Unknown',
         };
     }
 

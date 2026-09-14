@@ -3,7 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="color-scheme" content="light dark">
     <title>24/7 NHAM</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+
+    <script>
+        (function () {
+            const saved = localStorage.getItem('nham_theme');
+            const theme = (saved === 'dark' || saved === 'light') 
+                ? saved 
+                : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -99,6 +112,31 @@
         .btn-submit:hover { background: var(--green-dark); color: #fff; }
         .auth-link { color: var(--green-base); font-weight: 500; font-size: .83rem; }
         .auth-link:hover { color: var(--green-dark); }
+
+        /* Dark Theme Support */
+        .theme-toggle-btn { cursor: pointer; transition: transform .18s ease; background: transparent; }
+        .theme-toggle-btn:hover { transform: scale(1.08); }
+        html[data-bs-theme="dark"] .theme-icon-dark, html[data-theme="dark"] .theme-icon-dark { display: none !important; }
+        html[data-bs-theme="dark"] .theme-icon-light, html[data-theme="dark"] .theme-icon-light { display: inline-block !important; }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .theme-icon-light { display: none !important; }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .theme-icon-dark { display: inline-block !important; }
+
+        html[data-bs-theme="dark"], html[data-theme="dark"] { color-scheme: dark; }
+        html[data-bs-theme="dark"] body, html[data-theme="dark"] body { background: #0b1320; color: #e2e8f0; }
+        html[data-bs-theme="dark"] .navbar-nham, html[data-theme="dark"] .navbar-nham { background: #131c2e; border-bottom: 1px solid #223048; }
+        html[data-bs-theme="dark"] .auth-card, html[data-theme="dark"] .auth-card { background: #131c2e; border-color: #223048; color: #e2e8f0; }
+        html[data-bs-theme="dark"] .card, html[data-theme="dark"] .card { background-color: #131c2e !important; border-color: #223048 !important; color: #e2e8f0 !important; }
+        html[data-bs-theme="dark"] .card-header, html[data-theme="dark"] .card-header { background-color: #101928 !important; border-color: #223048 !important; color: #e2e8f0 !important; }
+        html[data-bs-theme="dark"] .form-control, html[data-theme="dark"] .form-control { background-color: #0b1320; border-color: #223048; color: #f8fafc; }
+        html[data-bs-theme="dark"] .input-group-text, html[data-theme="dark"] .input-group-text { background-color: #1a2538; border-color: #223048; color: #94a3b8; }
+        html[data-bs-theme="dark"] .dropdown-menu, html[data-theme="dark"] .dropdown-menu { background-color: #131c2e; border-color: #223048; color: #e2e8f0; }
+        html[data-bs-theme="dark"] .dropdown-item, html[data-theme="dark"] .dropdown-item { color: #cbd5e1; }
+        html[data-bs-theme="dark"] .dropdown-item:hover, html[data-theme="dark"] .dropdown-item:hover { background-color: #1e293b; color: #4ade80; }
+        html[data-bs-theme="dark"] .dropdown-divider, html[data-theme="dark"] .dropdown-divider { border-color: #223048; }
+        html[data-bs-theme="dark"] .nav-link, html[data-theme="dark"] .nav-link { color: #cbd5e1 !important; }
+        html[data-bs-theme="dark"] .text-dark, html[data-theme="dark"] .text-dark { color: #f8fafc !important; }
+        html[data-bs-theme="dark"] .bg-white, html[data-theme="dark"] .bg-white { background-color: #131c2e !important; }
+        html[data-bs-theme="dark"] .form-label, html[data-theme="dark"] .form-label { color: #cbd5e1; }
     </style>
 </head>
 
@@ -106,8 +144,8 @@
     <nav class="navbar navbar-expand-lg navbar-nham">
         <div class="container">
             <a class="navbar-brand navbar-brand-custom" href="{{ url('/') }}">
-                <div class="brand-icon"><i class="fas fa-store"></i></div>
-                24/7 NHAM
+                <img src="{{ asset('img/logo.png') }}" alt="24/7 NHAM" style="height: 38px; width: auto; object-fit: contain;">
+                <span style="font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; color: var(--green-dark);">24/7 NHAM</span>
             </a>
             <button class="navbar-toggler border-0" type="button"
                 data-bs-toggle="collapse" data-bs-target="#navbarMain"
@@ -116,6 +154,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                    <li class="nav-item me-lg-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 p-1 theme-toggle-btn d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                            <i class="bi bi-moon-stars-fill theme-icon-dark text-warning"></i>
+                            <i class="bi bi-sun-fill theme-icon-light text-warning"></i>
+                        </button>
+                    </li>
                     @guest
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">
@@ -128,19 +172,46 @@
                             </a>
                         </li>
                     @else
+                        @if(auth()->user()->role === 'admin')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class="fas fa-th-large me-1"></i> Dashboard
                             </a>
                         </li>
+                        @elseif(auth()->user()->isDriver())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('driver.dashboard') }}">
+                                <i class="fas fa-bicycle me-1"></i> Courier Portal
+                            </a>
+                        </li>
+                        @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('customer.orders.index') }}">
+                                <i class="fas fa-clock me-1"></i> My Orders
+                            </a>
+                        </li>
+                        @endif
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#"
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#"
                                id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user-circle me-1"></i> {{ auth()->user()->name }}
+                                @if(auth()->user()->avatar)
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle object-fit-cover border" style="width: 22px; height: 22px;">
+                                @else
+                                    <i class="fas fa-user-circle me-1"></i>
+                                @endif
+                                <span>{{ auth()->user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown">
+                                @if(auth()->user()->role === 'admin')
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">
                                     <i class="fas fa-th-large me-2 text-success"></i> Dashboard</a></li>
+                                @elseif(auth()->user()->isDriver())
+                                <li><a class="dropdown-item" href="{{ route('driver.dashboard') }}">
+                                    <i class="fas fa-bicycle me-2 text-success"></i> Courier Portal</a></li>
+                                @else
+                                <li><a class="dropdown-item" href="{{ route('customer.orders.index') }}">
+                                    <i class="fas fa-clock me-2 text-success"></i> My Orders</a></li>
+                                @endif
                                 <li><a class="dropdown-item" href="{{ route('profile.edit', auth()->user()->id) }}">
                                     <i class="fas fa-user-edit me-2 text-primary"></i> Edit Profile</a></li>
                                 <li><a class="dropdown-item" href="{{ route('form.password') }}">
@@ -179,6 +250,41 @@
     @if($errors->any())
     <script>Swal.fire({icon:'error',title:'Please check the form',html:@json(implode('<br>', $errors->all()))});</script>
     @endif
+
+    <script>
+        (function () {
+            function getPreferredTheme() {
+                const stored = localStorage.getItem('nham_theme');
+                if (stored === 'dark' || stored === 'light') return stored;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.setAttribute('data-theme', theme);
+                const isDark = theme === 'dark';
+                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                    btn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+                    btn.setAttribute('aria-label', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+                });
+            }
+
+            function toggleTheme() {
+                const current = document.documentElement.getAttribute('data-bs-theme') || getPreferredTheme();
+                const next = current === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('nham_theme', next);
+                applyTheme(next);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                    btn.addEventListener('click', toggleTheme);
+                });
+                applyTheme(getPreferredTheme());
+            });
+        })();
+    </script>
+
     @stack('scripts')
 </body>
 </html>

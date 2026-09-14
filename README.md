@@ -1,192 +1,224 @@
-# Laravel Blog + Shop — Fully Fixed + Flutter Integration
+# 24/7 NHAM — Full-Stack Food Delivery Ecosystem & Admin Portal
 
-## What was fixed / added
-
-### Laravel Bug Fixes
-| # | File | Issue | Fix |
-|---|------|-------|-----|
-| 1 | `routes/api.php` | Duplicate `/user` routes caused 500 errors | Removed duplicate; kept Sanctum-protected version |
-| 2 | `app/Models/Order.php` | `OrderItem` defined as second class in same file — PHP won't autoload it | Moved `OrderItem` to its own file `app/Models/OrderItem.php` |
-| 3 | `app/Models/Order.php` | `status` missing from `$fillable` — saves silently failed | Added `status` and `payment_intent_id` to `$fillable` |
-| 4 | `orders` migration | No `status` column — `StoreController` and `OrderController` referenced it | New migration adds `status` + `payment_intent_id` |
-| 5 | `PaymentController` | Amount trusted from client — security risk | Amount now calculated server-side from real DB prices |
-| 6 | `AuthController` | Login issued a new token without deleting old ones — token proliferation | `$user->tokens()->delete()` before issuing new token |
-| 7 | `AuthController::register` | No token returned — Flutter couldn't auto-login after register | Token now returned in register response |
-| 8 | `StoreController::checkout` | `user_id` hardcoded to `1` | Uses `Auth::user()->id` via API |
-
-### New Features Added
-- **API ProductController** — product listing with search & category filter, returns `image_url` for Flutter
-- **API OrderController** — authenticated order placement + history with items
-- **Profile update & change password** endpoints
-- **Flutter App** — complete Android app with:
-  - Login / Register screens with form validation
-  - Product grid with search, category filter, images
-  - Cart with quantity controls
-  - Stripe Payment Sheet integration
-  - Order history screen
-  - Profile screen with logout
-  - Secure token storage (flutter_secure_storage)
-  - Session restoration on app restart
+A modern, full-stack food delivery and e-commerce platform built with **Laravel 11**, **MySQL**, **Bootstrap 5**, **Leaflet.js**, **Cropper.js**, and **Stripe**. Features multi-role capabilities for **Customers**, **Couriers / Drivers**, and **Administrators**, comprehensive live shipment tracking, instant real-time search, interactive profile photo cropping, seamless light/dark modes, and Google OAuth.
 
 ---
 
-## Project Structure
+## 🌟 Highlights & Key Features
+
+### 1. Multi-Role Ecosystem & Role Assignment
+- **Customer / User**: Browse restaurants & menus, interactive cart, coupon code validation, Stripe checkout, multi-address management with Leaflet map pin-drop, 5-stage live delivery tracking, live support chat, dish reviews & ratings, and dispute filing.
+- **Courier / Driver**: Dedicated Driver Portal (`/driver`), online/offline availability switch, order acceptance, live delivery milestones (`picked_up`, `on_the_way`, `delivered`), trip earnings analytics, and vehicle profile settings.
+- **Store Administrator**: Admin Dashboard (`/dashboard`) with real-time KPI metrics, role assignment modals to promote/demote users (`admin`, `driver`, `customer`), active order reassignment & cancellation, promo code manager, dispute resolution center, store analytics, broadcast announcements, and audit logging.
+
+### 2. Google OAuth Authentication
+- **One-Click Sign-in & Registration**: Seamless "Sign in with Google" and "Register with Google" powered by Laravel Socialite.
+- **Account Linking & Profile Sync**: Automatically links Google IDs to existing customer accounts by email, captures Google profile pictures, and verifies email addresses.
+- **Role-Aware Redirection**: Redirects administrators to `/dashboard`, couriers to `/driver`, and customers to the homepage.
+- **Windows cURL SSL Resilient**: Bundled trusted Mozilla CA certificates (`storage/cacert.pem`) with automatic fallback to prevent cURL Error 60.
+
+### 3. Instant Automatic Search Across All Textboxes
+- **Type-and-Search**: Search triggers immediately from character 1 (`length >= 1`) with debounced AJAX requests—no minimum 2-character lockouts.
+- **Frontend Navbar Search**: Dropdown results displaying dish thumbnails, match highlights, prices, and direct links.
+- **Search Products Page**: Dual live-suggest dropdown and traditional full-page grid filtering.
+- **Admin Topbar Global Search**: Instant product suggestions with quick `Edit` and `View` actions (`Ctrl + K` shortcut).
+- **Admin Sidebar Filter**: Real-time filtering of sidebar navigation links across Menu and General sections.
+- **Order Tracking Search**: Auto-completes tracking codes, recipient names, order status, and timestamps.
+- **Admin Management Tables**: Real-time client-side instant filtering across Products, Orders, Categories, and User tables.
+
+### 4. Interactive Profile Photo Cropping
+- **Interactive Avatar Circle**: Clicking on user profile picture opens file picker.
+- **Format Verification**: Supports `.png`, `.jpg`, `.jpeg`, `.webp`, including uppercase extensions (`.PNG`, `.JPG`, `.JPEG`, `.WEBP`) up to 5MB.
+- **1:1 Circular Cropping Modal**: Powered by Cropper.js with zoom, 90° rotation, drag repositioning, reset, and live circular previews (120px and 60px).
+- **Dual Export**: Submits base64 data and standard binary file via `DataTransfer` API with safe backend hash storage.
+
+### 5. Seamless Light & Dark Mode
+- **Zero FOUC (Flash of Unstyled Content)**: Inline `<head>` script evaluates `localStorage.getItem('nham_theme')` or system `prefers-color-scheme` before HTML renders.
+- **Frontend Navbar**: Desktop and mobile header theme toggle buttons with animated sun/moon icons.
+- **Backend Admin Portal**: Theme toggle button in the sidebar and topbar with deep slate surfaces and high-contrast typography.
+
+### 6. Responsive Sidebar Toggle
+- **Open State**: Displays full brand name, icons, labels, badges, search box, and user card (248px width).
+- **Closed / Collapsed State**: Compact 72px icon bar with centered icons and tooltip hover titles (`display: none` for labels without layout shifts).
+- **Persistent State**: Saved in browser `localStorage` (`nham_sidebar_collapsed`).
+
+---
+
+## 🏛️ Architecture & System Modules
 
 ```
-output/
-├── laravel/                     ← Drop these files into your Laravel project
-│   ├── app/Http/Controllers/Api/
-│   │   ├── AuthController.php   ← Fixed + profile/change-password
-│   │   ├── ProductController.php← New API controller
-│   │   ├── OrderController.php  ← New API controller
-│   │   └── PaymentController.php← Fixed (server-side amount)
-│   ├── app/Models/
-│   │   ├── Order.php            ← Fixed fillable + status constants
-│   │   └── OrderItem.php       ← Fixed (moved to own file)
-│   ├── database/migrations/
-│   │   └── 2026_08_06_..._add_payment_fields_to_orders_table.php
-│   └── routes/api.php           ← Fixed routes (no duplicates)
-│
-└── flutter/                     ← Open as Flutter project in Android Studio
-    ├── pubspec.yaml
-    ├── android/AndroidManifest.xml
-    └── lib/
-        ├── main.dart
-        ├── models/
-        │   ├── product.dart
-        │   └── order.dart
-        ├── services/
-        │   ├── api_service.dart
-        │   ├── auth_provider.dart
-        │   └── cart_provider.dart
-        └── screens/
-            ├── splash_screen.dart
-            ├── login_screen.dart
-            ├── register_screen.dart
-            ├── home_screen.dart
-            ├── products_screen.dart
-            ├── cart_screen.dart
-            ├── orders_screen.dart
-            └── profile_screen.dart
+d:\lavavel_blog\
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── AdminPortalController.php     ← User roles, broadcasts, promos, analytics, disputes
+│   │   ├── AuthController.php            ← Auth, Google OAuth, dashboard, registration
+│   │   ├── CustomerOrderController.php   ← Customer order history, live tracking, cancellation
+│   │   ├── DriverController.php          ← Courier portal, order acceptance, earnings
+│   │   ├── ChatController.php            ← Customer-driver & support live chat channels
+│   │   ├── NotificationController.php    ← In-app notifications & read badges
+│   │   ├── AddressController.php         ← Multi-address pin-drop & distance calculation
+│   │   ├── PromoController.php           ← Coupon code redemption & discounts
+│   │   ├── ReviewController.php          ← Order & driver reviews with star ratings
+│   │   ├── DisputeController.php         ← Customer dispute filing & admin resolution
+│   │   ├── StoreController.php           ← Cart, checkout, Stripe payment intents
+│   │   ├── ProductController.php         ← Product CRUD & inventory
+│   │   └── CategoryController.php        ← Category management
+│   ├── Models/
+│   │   ├── User.php                      ← Customer, Driver, and Admin roles & relationships
+│   │   ├── Order.php                     ← Full lifecycle status & delivery tracking
+│   │   ├── OrderItem.php                 ← Individual cart items & pricing
+│   │   ├── UserAddress.php               ← GPS coordinates (lat/lng), default address
+│   │   ├── ChatMessage.php               ← Live chat channels & read receipts
+│   │   ├── InAppNotification.php         ← Push alerts across customer, driver, and admin
+│   │   ├── PromoCode.php                 ← Discount percentages and fixed reductions
+│   │   ├── OrderReview.php               ← Ratings and feedback
+│   │   ├── Dispute.php                   ← Dispute tickets & resolution notes
+│   │   └── AuditLog.php                  ← System admin activity logs
+│   └── Providers/
+│       └── AppServiceProvider.php        ← Global view composers & topbar alerts
+├── resources/views/
+│   ├── layout/
+│   │   ├── frontend.blade.php            ← Customer layout (Mega menu, navbar search, dark mode)
+│   │   └── backend.blade.php             ← Admin layout (Collapsible sidebar, topbar, dark mode)
+│   ├── frontend/                         ← Customer views (Cart, checkout, tracking, addresses)
+│   ├── backend/                          ← Admin views (Users, active orders, disputes, analytics)
+│   ├── driver/                           ← Courier views (Dashboard, active trip, earnings)
+│   └── auth/                             ← Login, register, profile cropper, password reset
+├── routes/
+│   ├── web.php                           ← Web routes (Public, Customer, Driver, Admin)
+│   └── api.php                           ← REST API routes (Sanctum protected)
+└── tests/Feature/                        ← Automated test suites (55 tests, 322 assertions)
 ```
 
 ---
 
-## Setup: Laravel API
+## 🛠️ Installation & Setup
 
-### 1. Copy files
-Copy each file from `output/laravel/` into the matching path in your project.
+### 1. Prerequisites
+- **PHP**: 8.2 or higher (OpenSSL, cURL, PDO MySQL, Mbstring extensions enabled)
+- **Composer**: Latest version
+- **Node.js & NPM**: Node 18+
+- **Database**: MySQL 8.0+
 
-### 2. Run the new migration
-```bash
-php artisan migrate
+### 2. Clone & Install Dependencies
+```powershell
+# Clone the repository
+git clone https://github.com/your-username/lavavel_blog.git
+cd lavavel_blog
+
+# Install PHP dependencies
+composer install
+
+# Install Frontend dependencies
+npm install
 ```
 
-### 3. Add Stripe keys to `.env`
-```env
+### 3. Environment Configuration
+Copy the `.env.example` file to `.env`:
+```powershell
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure your `.env` settings:
+```ini
+APP_NAME="24/7 NHAM"
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ecommerce_1
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Stripe Payment Keys
 STRIPE_KEY=pk_test_YOUR_PUBLISHABLE_KEY
 STRIPE_SECRET=sk_test_YOUR_SECRET_KEY
-```
-Get keys from https://dashboard.stripe.com/test/apikeys
 
-### 4. Make sure `config/services.php` has Stripe
-```php
-'stripe' => [
-    'key'    => env('STRIPE_KEY'),
-    'secret' => env('STRIPE_SECRET'),
-],
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
 ```
-*(Already done in your project — just needs the .env values)*
 
-### 5. Ensure Sanctum is configured
-```bash
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+### 4. Database Migrations
+```powershell
+php artisan migrate
 ```
-In `bootstrap/app.php` or `config/sanctum.php`, ensure `stateful` domains are set for your Flutter app if needed (for mobile/API-only usage the default token guard is fine).
+*(Note: Never run `migrate:fresh` or `db:wipe` on production environments).*
 
-### 6. Start the server
-```bash
+### 5. Build Assets & Start Server
+```powershell
+# Build frontend assets
+npm run build
+
+# Start Laravel development server
 php artisan serve
-# Available at http://127.0.0.1:8000
+# App running at http://127.0.0.1:8000
 ```
 
 ---
 
-## Setup: Flutter (Android Studio)
+## 🧪 Testing & Code Quality
 
-### 1. Open the project
-- Open Android Studio → **Open** → select the `output/flutter/` folder
+The project includes an extensive automated test suite covering all authentication, delivery, role assignment, and search flows:
 
-### 2. Set your API URL
-In `lib/services/api_service.dart`:
-```dart
-// Android Emulator:
-static const String baseUrl = 'http://10.0.2.2:8000/api';
-
-// Physical device (replace with your PC's LAN IP):
-static const String baseUrl = 'http://192.168.1.42:8000/api';
+```powershell
+# Run the complete test suite
+php artisan test
 ```
 
-### 3. Set your Stripe publishable key
-In `lib/main.dart`:
-```dart
-const String stripePublishableKey = 'pk_test_YOUR_KEY_HERE';
-```
+### Test Coverage (55 Tests, 322 Assertions)
+- **`GoogleAuthTest`** (7 tests): Google redirect, customer creation, account linking, admin dashboard redirect, API callback, error handling, suspended user guard.
+- **`AdminAssignRoleTest`** (6 tests): User role assignment (`admin`, `driver`, `customer`), courier onboarding, self-demotion protection.
+- **`SidebarToggleTest`** (3 tests): Icon and name toggling, collapsed icon bar, localStorage persistence.
+- **`InstantSearchTest`** (5 tests): Real-time navbar search, 1-character trigger, category filtering.
+- **`ThemeModeTest`** (3 tests): Light/dark mode switching, FOUC prevention.
+- **`ProfilePhotoUploadTest`** (9 tests): Image validation, crop data handling, uppercase extension support (`.PNG`, `.WEBP`).
+- **`ComprehensiveDeliveryPlatformTest`** (11 tests): Full delivery lifecycle from order placement to driver delivery.
+- **`CustomerOrderTrackingTest`** (6 tests): Live tracking lookup, milestone progressions.
+- **`AuthRoleTest`** (3 tests): Role-based middleware and access boundaries.
 
-### 4. Install dependencies
-```bash
-flutter pub get
+### Code Style (Laravel Pint)
+All PHP files adhere to clean code and PSR-12 / Laravel standards:
+```powershell
+vendor\bin\pint --test
 ```
-
-### 5. Run on Android emulator or device
-```bash
-flutter run
-```
-
-### 6. AndroidManifest.xml
-Replace the `android/app/src/main/AndroidManifest.xml` in your Flutter project with the one provided in `output/flutter/android/`.  
-It adds the `INTERNET` permission and the Stripe 3DS redirect intent filter.
 
 ---
 
-## API Reference
+## 🧭 Core Route Map
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/register` | No | Register + returns token |
-| POST | `/api/login` | No | Login + returns token |
-| GET | `/api/me` | Bearer | Get current user |
-| PUT | `/api/profile` | Bearer | Update name/email |
-| PUT | `/api/change-password` | Bearer | Change password |
-| POST | `/api/logout` | Bearer | Revoke token |
-| GET | `/api/products` | No | List products (filter: category_id, search) |
-| GET | `/api/products/{id}` | No | Get single product |
-| GET | `/api/categories` | No | List categories |
-| GET | `/api/orders` | Bearer | My orders with items |
-| POST | `/api/orders` | Bearer | Place order |
-| POST | `/api/create-payment-intent` | Bearer | Create Stripe intent |
+| Role / Area | Path | Method | Description |
+| :--- | :--- | :--- | :--- |
+| **Public** | `/` | `GET` | Homepage with hero, category sliders & dish grid |
+| **Public** | `/list` | `GET` | Browse full food & beverage catalog |
+| **Public** | `/search` | `GET` | Instant search results page |
+| **Public** | `/track/{code?}` | `GET` | Public live order tracking timeline |
+| **Auth** | `/login` | `GET/POST` | Sign in with email or Google |
+| **Auth** | `/registration` | `GET/POST` | Register account or register with Google |
+| **Auth** | `/auth/redirect` | `GET` | Google OAuth redirect |
+| **Auth** | `/api/auth/google/callback` | `GET` | Google OAuth callback handler |
+| **Customer** | `/my-orders` | `GET` | Order history, receipts & reorder |
+| **Customer** | `/addresses` | `GET/POST` | Multi-address book with map pin-drop |
+| **Customer** | `/favorites` | `GET` | Saved meals and favorite items |
+| **Customer** | `/support/chat` | `GET/POST` | 24/7 Live Support customer chat |
+| **Driver** | `/driver` | `GET` | Courier dashboard & incoming orders |
+| **Driver** | `/driver/toggle-status` | `POST` | Switch driver availability (online/offline) |
+| **Driver** | `/driver/active` | `GET` | Active delivery route & status milestones |
+| **Driver** | `/driver/earnings` | `GET` | Trip earnings and payout summary |
+| **Admin** | `/dashboard` | `GET` | Store manager dashboard & KPIs |
+| **Admin** | `/admin/users` | `GET` | User & Courier directory & role assignment |
+| **Admin** | `/admin/users/{id}/assign-role` | `POST` | Assign role (`admin`, `driver`, `customer`) |
+| **Admin** | `/admin/active-orders` | `GET` | Live delivery dispatch & reassignment |
+| **Admin** | `/admin/promos` | `GET/POST` | Promo discount code management |
+| **Admin** | `/admin/disputes` | `GET/POST` | Dispute review & resolution center |
+| **Admin** | `/admin/broadcast` | `GET/POST` | Push broadcast notification sender |
+| **Admin** | `/admin/analytics` | `GET` | Revenue charts, driver ratings, sales KPIs |
+| **Admin** | `/admin/audit-logs` | `GET` | Administrative security audit trail |
 
 ---
 
-## Stripe Payment Flow (Mobile)
-
-```
-Flutter Cart  →  POST /api/create-payment-intent  →  Laravel creates PaymentIntent
-     ↓                                                        ↓
-Stripe SDK shows Payment Sheet           ← clientSecret returned
-     ↓
-User pays (card / Google Pay / etc.)
-     ↓
-Payment success  →  POST /api/orders  →  Laravel saves order with payment_intent_id
-     ↓
-Show Orders screen
-```
-
-### Test Cards
-| Card | Result |
-|------|--------|
-| 4242 4242 4242 4242 | Success |
-| 4000 0000 0000 9995 | Decline |
-| 4000 0025 0000 3155 | 3DS Auth required |
-
-Use any future expiry date and any 3-digit CVC.
+## 📄 License
+This project is open-sourced software licensed under the [MIT license](LICENSE).

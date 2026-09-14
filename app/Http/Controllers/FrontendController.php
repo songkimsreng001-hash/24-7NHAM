@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class FrontendController extends Controller
@@ -16,17 +16,37 @@ class FrontendController extends Controller
     {
         $categories = Category::all();
         // Show all products on the home page
-        $products = Product::orderBy('created_at','DESC')->get();
+        $products = Product::orderBy('created_at', 'DESC')->get();
+
         return view('frontend.index')
             ->with('products', $products)
             ->with('categories', $categories);
     }
 
-     public function list()
+    public function list(Request $request)
     {
         $categories = Category::all();
-                $products = Product::orderBy('created_at','DESC')->paginate(12);
-      return view('frontend.list')->with('products',$products)->with('categories', $categories);
+        $query = Product::with('category')->orderBy('created_at', 'DESC');
+
+        if ($request->filled('category')) {
+            $cat = trim((string) $request->query('category'));
+            $clean = str_replace(['-', '_'], ' ', strtolower($cat));
+            $collapsed = str_replace(['-', '_', ' '], '', strtolower($cat));
+
+            $query->whereHas('category', function ($q) use ($cat, $clean, $collapsed) {
+                if (is_numeric($cat)) {
+                    $q->where('id', $cat);
+                } else {
+                    $q->where(DB::raw('LOWER(name)'), 'LIKE', "%{$clean}%")
+                        ->orWhere(DB::raw('LOWER(name)'), 'LIKE', "%{$cat}%")
+                        ->orWhere(DB::raw("REPLACE(LOWER(name), ' ', '')"), 'LIKE', "%{$collapsed}%");
+                }
+            });
+        }
+
+        $products = $query->paginate(12)->withQueryString();
+
+        return view('frontend.list')->with('products', $products)->with('categories', $categories);
     }
 
     /**
@@ -51,7 +71,8 @@ class FrontendController extends Controller
     public function show($id)
     {
         $categories = Category::all();
-        return view('frontend.show')->with('product', Product::find($id))->with('categories',$categories);
+
+        return view('frontend.show')->with('product', Product::find($id))->with('categories', $categories);
     }
 
     /**
@@ -77,37 +98,39 @@ class FrontendController extends Controller
     {
         //
     }
+
     public function getBySearch(Request $request)
     {
-        $keyword = !empty($request->input('keyword')) ? $request->input('keyword') : "";
-        if ($keyword != "") {
-            return view('frontend.search')
-                ->with('products', Product::where('name', 'LIKE', '%' . $keyword . '%')->paginate(12))
-                ->with('keyword', $keyword);
-        } else {
-            return view('frontend.search')
-                ->with('products', Product::paginate(12))
-                ->with('keyword', $keyword);
-        }
+        $keyword = trim((string) $request->input('keyword', $request->input('title', '')));
+        $products = ($keyword !== '')
+            ? Product::where('name', 'LIKE', '%'.$keyword.'%')->paginate(12)->withQueryString()
+            : Product::paginate(12)->withQueryString();
+
+        return view('frontend.search')
+            ->with('products', $products)
+            ->with('keyword', $keyword);
     }
 
     public function navbarSearch(Request $request)
     {
         $keyword = trim((string) $request->input('keyword', $request->input('title', '')));
-        if (mb_strlen($keyword) < 2) {
+        if (mb_strlen($keyword) < 1) {
             return response()->json([]);
         }
 
         return response()->json(
-            Product::where('name', 'like', '%' . $keyword . '%')
+            Product::where('name', 'like', '%'.$keyword.'%')
                 ->orderBy('name')
-                ->limit(8)
-                ->get(['id', 'name', 'price'])
+                ->limit(10)
+                ->get()
                 ->map(fn ($product) => [
                     'id' => $product->id,
                     'title' => $product->name,
                     'price' => number_format((float) $product->price, 2),
-                    'url' => url('/show/' . $product->id),
+                    'image' => $product->image_url,
+                    'url' => url('/show/'.$product->id),
+                    'admin_url' => url('/product/'.$product->id),
+                    'edit_url' => url('/product/'.$product->id.'/edit'),
                 ])
                 ->values()
         );
@@ -116,7 +139,7 @@ class FrontendController extends Controller
     public function categories()
     {
         $categories = Category::all();
-        $products = Product::orderBy('created_at','DESC')->paginate(12);
+        $products = Product::orderBy('created_at', 'DESC')->paginate(12);
 
         return view('frontend.category')
             ->with('categories', $categories)
@@ -127,11 +150,20 @@ class FrontendController extends Controller
     public function getByCategory($id)
     {
         $categories = Category::all();
-        $selectedCategory = Category::find($id);
+        $clean = str_replace(['-', '_'], ' ', strtolower($id));
+        $collapsed = str_replace(['-', '_', ' '], '', strtolower($id));
+
+        $selectedCategory = is_numeric($id)
+            ? Category::find($id)
+            : Category::where(DB::raw('LOWER(name)'), 'LIKE', "%{$clean}%")
+                ->orWhere(DB::raw('LOWER(name)'), 'LIKE', "%{$id}%")
+                ->orWhere(DB::raw("REPLACE(LOWER(name), ' ', '')"), 'LIKE', "%{$collapsed}%")
+                ->first();
+
         $products = collect();
 
         if ($selectedCategory) {
-            $products = Product::where('category_id', $id)->paginate(12);
+            $products = Product::where('category_id', $selectedCategory->id)->paginate(12)->withQueryString();
         }
 
         return view('frontend.category')
@@ -140,4 +172,3 @@ class FrontendController extends Controller
             ->with('selectedCategory', $selectedCategory);
     }
 }
-  

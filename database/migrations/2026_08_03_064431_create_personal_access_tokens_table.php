@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('personal_access_tokens')) {
+        if (! Schema::hasTable('personal_access_tokens')) {
             Schema::create('personal_access_tokens', function (Blueprint $table) {
                 $table->id();
                 $table->morphs('tokenable');
@@ -26,31 +26,31 @@ return new class extends Migration
             return;
         }
 
-        if (!Schema::hasColumn('personal_access_tokens', 'tokenable_type')) {
+        if (! Schema::hasColumn('personal_access_tokens', 'tokenable_type')) {
             Schema::table('personal_access_tokens', function (Blueprint $table) {
                 $table->morphs('tokenable');
             });
         }
 
-        if (!Schema::hasColumn('personal_access_tokens', 'token')) {
+        if (! Schema::hasColumn('personal_access_tokens', 'token')) {
             Schema::table('personal_access_tokens', function (Blueprint $table) {
                 $table->string('token', 64)->unique();
             });
         }
 
-        if (!Schema::hasColumn('personal_access_tokens', 'abilities')) {
+        if (! Schema::hasColumn('personal_access_tokens', 'abilities')) {
             Schema::table('personal_access_tokens', function (Blueprint $table) {
                 $table->text('abilities')->nullable();
             });
         }
 
-        if (!Schema::hasColumn('personal_access_tokens', 'last_used_at')) {
+        if (! Schema::hasColumn('personal_access_tokens', 'last_used_at')) {
             Schema::table('personal_access_tokens', function (Blueprint $table) {
                 $table->timestamp('last_used_at')->nullable();
             });
         }
 
-        if (!Schema::hasColumn('personal_access_tokens', 'expires_at')) {
+        if (! Schema::hasColumn('personal_access_tokens', 'expires_at')) {
             Schema::table('personal_access_tokens', function (Blueprint $table) {
                 $table->timestamp('expires_at')->nullable()->index();
             });

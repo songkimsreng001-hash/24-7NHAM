@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-       
+
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string("name", 255)->nullable();
-            $table->string("description", 500)->nullable();
-            $table->string("image", 255)->nullable();
-            $table->decimal("price", 6, 2);
+            $table->string('name', 255)->nullable();
+            $table->string('description', 500)->nullable();
+            $table->string('image', 255)->nullable();
+            $table->decimal('price', 6, 2);
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories');
             $table->timestamps();

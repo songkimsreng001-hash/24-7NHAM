@@ -7,9 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-
 
 class AuthController extends Controller
 {
@@ -21,8 +19,8 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -31,8 +29,8 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
@@ -40,7 +38,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user'  => $user,
+            'user' => $user,
             'token' => $token,
         ], 201);
     }
@@ -51,7 +49,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
@@ -70,7 +68,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user'  => $user,
+            'user' => $user,
             'token' => $token,
         ]);
     }
@@ -83,8 +81,7 @@ class AuthController extends Controller
      * email, and return a Sanctum token in the exact same shape as login()
      * and register() above — so the Flutter side needs zero special-casing.
      */
-
-    function googleOAuthRedirect(Request $request)
+    public function googleOAuthRedirect(Request $request)
     {
         $callback_url = $request->query('callback_url', '');
 
@@ -97,13 +94,13 @@ class AuthController extends Controller
         return response(['redirect_url' => $redirectUrl], 200);
     }
 
-    function googleOAuthCallback(Request $request)
+    public function googleOAuthCallback(Request $request)
     {
         $callback_url = base64_decode($request->query('state', ''));
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
-            return redirect($callback_url . '?error=google_oauth_failed');
+            return redirect($callback_url.'?error=google_oauth_failed');
         }
 
         $user = User::firstOrCreate(
@@ -115,20 +112,20 @@ class AuthController extends Controller
 
         $user->save();
 
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
 
         $token = $user->createToken('auth_token', ['exchange-new-token'], now()->addMinute())->plainTextToken;
 
-        return redirect($callback_url . '?token=' . urlencode($token));
+        return redirect($callback_url.'?token='.urlencode($token));
     }
 
-    function googleOAuthExchangeToken(Request $request)
+    public function googleOAuthExchangeToken(Request $request)
     {
         $user = $request->user();
 
-        if (!$user->currentAccessToken()->can('exchange-new-token')) {
+        if (! $user->currentAccessToken()->can('exchange-new-token')) {
             return response(['message' => 'Invalid token.'], 403);
         }
 
@@ -139,7 +136,7 @@ class AuthController extends Controller
         return response([
             'message' => 'User signed in.',
             'user' => new UserResource($user),
-            'token' => $token
+            'token' => $token,
         ], 200);
     }
 

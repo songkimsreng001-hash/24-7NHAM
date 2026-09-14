@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Throwable;
 
 class PaymentController extends Controller
@@ -61,6 +60,7 @@ class PaymentController extends Controller
             ]);
         } catch (Throwable $e) {
             report($e);
+
             return response()->json(['message' => 'Payment intent creation failed.'], 500);
         }
     }

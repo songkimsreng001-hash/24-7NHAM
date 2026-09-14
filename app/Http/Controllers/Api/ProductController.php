@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class ProductController extends Controller
@@ -25,7 +23,7 @@ class ProductController extends Controller
             }
 
             if ($request->filled('search')) {
-                $query->where('name', 'like', '%' . $request->search . '%');
+                $query->where('name', 'like', '%'.$request->search.'%');
             }
 
             $products = $query->orderBy('created_at', 'desc')->get();
@@ -33,20 +31,21 @@ class ProductController extends Controller
             // Append full image URL so Flutter can load it directly
             $products->transform(function ($product) {
                 $product->image_url = $product->image
-                    ? asset('img/' . $product->image)
+                    ? asset('img/'.$product->image)
                     : null;
+
                 return $product;
             });
 
             return response()->json([
-                'message'  => 'Products fetched',
+                'message' => 'Products fetched',
                 'products' => $products,
             ]);
 
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Failed to fetch products',
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -57,9 +56,9 @@ class ProductController extends Controller
     public function show($id)
     {
         try {
-            $product           = Product::with('category')->findOrFail($id);
+            $product = Product::with('category')->findOrFail($id);
             $product->image_url = $product->image
-                ? asset('img/' . $product->image)
+                ? asset('img/'.$product->image)
                 : null;
 
             return response()->json([
@@ -70,7 +69,7 @@ class ProductController extends Controller
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Product not found',
-                'error'   => $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 404);
         }
     }

@@ -13,6 +13,15 @@
 
     <div class="card-body p-0">
         @if (count($products) > 0)
+            <div class="px-3 py-2 border-bottom bg-light bg-opacity-50 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="input-group input-group-sm" style="max-width: 360px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="productTableFilter" class="form-control border-start-0" placeholder="Filter products by name, description, price..." autocomplete="off">
+                </div>
+                <span id="productTableFilterCount" class="badge bg-secondary-subtle text-secondary border fw-medium px-2 py-1">
+                    {{ count($products) }} products
+                </span>
+            </div>
             <div class="table-responsive">
                 <table id="myTable" class="table table-hover align-middle mb-0">
                     <thead class="table-light">
@@ -100,6 +109,45 @@
                 });
             });
         });
+
+        // Automatic Instant Table Search as soon as characters are typed
+        const productTableFilter = document.getElementById('productTableFilter');
+        const productTableFilterCount = document.getElementById('productTableFilterCount');
+        const productRows = document.querySelectorAll('#myTable tbody tr');
+
+        if (productTableFilter) {
+            productTableFilter.addEventListener('input', function () {
+                const q = this.value.trim().toLowerCase();
+                let matched = 0;
+
+                productRows.forEach(row => {
+                    if (row.id === 'productNoMatchRow') return;
+                    const text = row.innerText.toLowerCase();
+                    const match = !q || text.includes(q);
+                    row.style.display = match ? '' : 'none';
+                    if (match) matched++;
+                });
+
+                if (productTableFilterCount) {
+                    productTableFilterCount.textContent = q 
+                        ? `${matched} of ${productRows.length} matches` 
+                        : `${productRows.length} products`;
+                }
+
+                let noMatchRow = document.getElementById('productNoMatchRow');
+                if (matched === 0 && q) {
+                    if (!noMatchRow) {
+                        noMatchRow = document.createElement('tr');
+                        noMatchRow.id = 'productNoMatchRow';
+                        noMatchRow.innerHTML = `<td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i>No products found matching "${this.value}"</td>`;
+                        document.querySelector('#myTable tbody').appendChild(noMatchRow);
+                    }
+                    noMatchRow.style.display = '';
+                } else if (noMatchRow) {
+                    noMatchRow.style.display = 'none';
+                }
+            });
+        }
 
         // Trigger SweetAlert2 Toast on Success Session Flash
         @if(Session::has('product_delete'))

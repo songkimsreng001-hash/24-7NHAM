@@ -23,18 +23,21 @@
 
         {{-- Product image --}}
         <div class="col-md-6">
-            <div style="border-radius:20px; overflow:hidden; background:#f8fafc; border:1px solid #f1f5f9;">
-                @if($product->image)
-                    <img src="{{ asset('img/' . $product->image) }}"
-                         alt="{{ $product->name }}"
-                         class="img-fluid w-100"
-                         style="aspect-ratio:4/3; object-fit:cover;">
-                @else
-                    <img src="https://dummyimage.com/600x450/dcfce7/166534.jpg&text={{ urlencode($product->name) }}"
-                         alt="{{ $product->name }}"
-                         class="img-fluid w-100"
-                         style="aspect-ratio:4/3; object-fit:cover;">
-                @endif
+            <div class="position-relative" style="border-radius:20px; overflow:hidden; background:#f8fafc; border:1px solid #f1f5f9;">
+                <img src="{{ $product->image_url }}"
+                     alt="{{ $product->name }}"
+                     class="img-fluid w-100"
+                     style="aspect-ratio:4/3; object-fit:cover;">
+                @auth
+                <form action="{{ route('favorites.toggle', $product->id) }}" method="POST" class="position-absolute top-0 end-0 m-3" style="z-index: 5;">
+                    @csrf
+                    <button type="submit" class="btn btn-light rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center border-0"
+                            style="width: 42px; height: 42px; background: rgba(255,255,255,0.92);"
+                            title="{{ $product->isFavoritedBy(Auth::user()) ? 'Remove from favorites' : 'Save to favorites' }}">
+                        <i class="bi {{ $product->isFavoritedBy(Auth::user()) ? 'bi-heart-fill text-danger' : 'bi-heart text-muted' }}" style="font-size: 1.25rem;"></i>
+                    </button>
+                </form>
+                @endauth
             </div>
         </div>
 

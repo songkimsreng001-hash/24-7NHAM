@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Http\Request;
+
 class PostController extends Controller
 {
     /**
@@ -20,8 +21,9 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate(['title' => 'required', 'content' => 'required',]);
+        $validated = $request->validate(['title' => 'required', 'content' => 'required']);
         $post = Post::create($validated);
+
         return response()->json($post, 201);
     }
 
@@ -31,6 +33,7 @@ class PostController extends Controller
     public function show(string $id)
     {
         $post = Post::findOrFail($id);
+
         return response()->json($post, 200);
     }
 
@@ -40,8 +43,9 @@ class PostController extends Controller
     public function update(Request $request, string $id)
     {
         $post = Post::findOrFail($id);
-        $validated = $request->validate(['title' => 'required', 'content' => 'required',]);
+        $validated = $request->validate(['title' => 'required', 'content' => 'required']);
         $post->update($validated);
+
         return response()->json($post, 200);
     }
 
@@ -51,6 +55,7 @@ class PostController extends Controller
     public function destroy(string $id)
     {
         Post::findOrFail($id)->delete();
+
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 }

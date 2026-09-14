@@ -40,8 +40,14 @@ return [
     ],
 
     'google' => [
-        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect'      => env('GOOGLE_REDIRECT_URI'), // not used for the mobile token flow, but Socialite requires it to be set
+        'redirect' => env('GOOGLE_REDIRECT_URI', 'http://127.0.0.1:8000/api/auth/google/callback'),
+        'guzzle' => [
+            'verify' => file_exists(base_path('storage/cacert.pem'))
+                ? base_path('storage/cacert.pem')
+                : (file_exists('D:/php/cacert.pem') ? 'D:/php/cacert.pem' : false),
+            'timeout' => 20,
+        ],
     ],
 ];

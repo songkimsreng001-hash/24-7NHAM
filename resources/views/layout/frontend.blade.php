@@ -5,8 +5,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="24/7 NHAM — Food, Drinks & More" />
+    <meta name="color-scheme" content="light dark" />
 
     <title>@yield('page-title', '24/7 NHAM')</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+
+    <script>
+        (function () {
+            const saved = localStorage.getItem('nham_theme');
+            const theme = (saved === 'dark' || saved === 'light') 
+                ? saved 
+                : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -69,6 +82,20 @@
             white-space: nowrap;
         }
 
+        .brand-logo-img {
+            height: 42px;
+            width: auto;
+            max-width: 48px;
+            object-fit: contain;
+            display: inline-block;
+            vertical-align: middle;
+            border-radius: 8px;
+            transition: transform .2s ease;
+        }
+        .navbar-brand-custom:hover .brand-logo-img {
+            transform: scale(1.05);
+        }
+
         .brand-icon {
             width: 32px;
             height: 32px;
@@ -98,7 +125,7 @@
         }
 
         /* =========================================================
-           DROPDOWN
+           DROPDOWN & MEGA MENU
         ========================================================= */
         .navbar-nham .dropdown-menu {
             border: 1px solid #e2e8f0;
@@ -117,6 +144,177 @@
         .navbar-nham .dropdown-item:hover {
             background: var(--green-pale);
             color: var(--green-base);
+        }
+
+        /* =========================================================
+           MEGA DROPDOWN SPECIFIC
+        ========================================================= */
+        .navbar-nham .container {
+            position: relative;
+        }
+
+        @media (min-width: 992px) {
+            .nav-item.dropdown-mega {
+                position: static !important;
+            }
+
+            .dropdown-mega .dropdown-mega-menu {
+                position: absolute !important;
+                top: 100% !important;
+                left: 12px !important;
+                right: 12px !important;
+                width: calc(100% - 24px) !important;
+                min-width: calc(100% - 24px) !important;
+                max-width: 1320px;
+                margin: 6px auto 0 !important;
+                border-radius: 18px !important;
+                border: 1px solid #e2e8f0 !important;
+                background: #ffffff;
+                box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.05);
+                padding: 24px 26px 18px !important;
+                animation: megaDropdownFade .22s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 1060;
+            }
+
+            .nav-item.dropdown-mega:hover > .dropdown-mega-menu {
+                display: block !important;
+            }
+
+            .nav-item.dropdown-mega:hover > .nav-link.dropdown-toggle {
+                color: var(--green-base) !important;
+                background: var(--green-pale);
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            .dropdown-mega .dropdown-mega-menu {
+                position: static !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+                border-radius: 14px !important;
+                padding: 16px !important;
+                margin-top: 10px !important;
+                background: #f8fafc;
+                max-height: 75vh;
+                overflow-y: auto;
+            }
+
+            .dropdown-mega .mega-menu-item {
+                background: #ffffff;
+                border: 1px solid #edf2f7;
+                margin-bottom: 6px;
+            }
+        }
+
+        @keyframes megaDropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mega-column-title {
+            font-size: .74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: #64748b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mega-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #1e293b;
+            transition: all .16s ease;
+        }
+
+        .mega-menu-item:hover {
+            background: var(--green-pale);
+            transform: translateX(3px);
+            color: #1e293b;
+        }
+
+        .mega-menu-item.active {
+            background: var(--green-pale);
+            border-left: 3px solid var(--green-base);
+        }
+
+        .mega-menu-item:hover .mega-item-name {
+            color: var(--green-base);
+        }
+
+        .mega-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+            transition: transform .18s;
+        }
+
+        .mega-menu-item:hover .mega-item-icon {
+            transform: scale(1.08);
+        }
+
+        .mega-item-text {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .mega-item-name {
+            font-size: .83rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.25;
+        }
+
+        .mega-item-desc {
+            font-size: .71rem;
+            color: #64748b;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mega-promo-card {
+            background: linear-gradient(145deg, #15803d 0%, #16a34a 100%);
+            color: #ffffff;
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mega-promo-card::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            width: 110px;
+            height: 110px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .mega-menu-footer {
+            border-top: 1px solid #f1f5f9;
         }
 
         /* =========================================================
@@ -376,7 +574,7 @@
             margin-bottom: 0;
         }
 
-        .hero-strip h1 {
+        /* .hero-strip h1 {
             font-size: 2.2rem;
             font-weight: 800;
             margin-bottom: 10px;
@@ -420,7 +618,7 @@
 
         .hero-search button:hover {
             background: var(--green-dark);
-        }
+        } */
 
         .cat-pill-row {
             background: #fff;
@@ -710,6 +908,317 @@
                 padding: 7px 11px;
             }
         }
+
+        /* =========================================================
+           DARK MODE STYLING (FRONTEND & NAVBAR)
+        ========================================================= */
+        .theme-toggle-btn {
+            cursor: pointer;
+            transition: transform .18s ease, background-color .18s ease;
+            background: transparent;
+        }
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* Automatic icon display switching */
+        html[data-bs-theme="dark"] .theme-icon-dark,
+        html[data-theme="dark"] .theme-icon-dark {
+            display: none !important;
+        }
+        html[data-bs-theme="dark"] .theme-icon-light,
+        html[data-theme="dark"] .theme-icon-light {
+            display: inline-block !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .theme-icon-light {
+            display: none !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .theme-icon-dark {
+            display: inline-block !important;
+        }
+
+        html[data-bs-theme="dark"],
+        html[data-theme="dark"] {
+            color-scheme: dark;
+        }
+
+        html[data-bs-theme="dark"] body,
+        html[data-theme="dark"] body {
+            background-color: #0b1320;
+            color: #e2e8f0;
+        }
+
+        html[data-bs-theme="dark"] .navbar-nham,
+        html[data-theme="dark"] .navbar-nham {
+            background-color: #131c2e;
+            border-bottom: 1px solid #223048;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        html[data-bs-theme="dark"] .navbar-brand-custom span,
+        html[data-theme="dark"] .navbar-brand-custom span {
+            color: #4ade80 !important;
+        }
+
+        html[data-bs-theme="dark"] .nav-link,
+        html[data-theme="dark"] .nav-link {
+            color: #cbd5e1 !important;
+        }
+        html[data-bs-theme="dark"] .nav-link:hover,
+        html[data-theme="dark"] .nav-link:hover,
+        html[data-bs-theme="dark"] .nav-link.active,
+        html[data-theme="dark"] .nav-link.active {
+            color: #4ade80 !important;
+        }
+
+        html[data-bs-theme="dark"] .navbar-search,
+        html[data-theme="dark"] .navbar-search {
+            background-color: #0b1320;
+            border-color: #24344d;
+        }
+        html[data-bs-theme="dark"] .navbar-search-input,
+        html[data-theme="dark"] .navbar-search-input {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .navbar-search-input::placeholder,
+        html[data-theme="dark"] .navbar-search-input::placeholder {
+            color: #64748b;
+        }
+        html[data-bs-theme="dark"] .navbar-search-results,
+        html[data-theme="dark"] .navbar-search-results {
+            background-color: #131c2e;
+            border-color: #24344d;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        html[data-bs-theme="dark"] .navbar-search-item:hover,
+        html[data-theme="dark"] .navbar-search-item:hover {
+            background-color: #1e293b;
+        }
+
+        html[data-bs-theme="dark"] .dropdown-menu,
+        html[data-theme="dark"] .dropdown-menu {
+            background-color: #131c2e;
+            border-color: #24344d;
+            color: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        html[data-bs-theme="dark"] .dropdown-item,
+        html[data-theme="dark"] .dropdown-item {
+            color: #cbd5e1;
+        }
+        html[data-bs-theme="dark"] .dropdown-item:hover,
+        html[data-theme="dark"] .dropdown-item:hover {
+            background-color: #1e293b;
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .dropdown-divider,
+        html[data-theme="dark"] .dropdown-divider {
+            border-color: #24344d;
+        }
+
+        html[data-bs-theme="dark"] .dropdown-mega-menu,
+        html[data-theme="dark"] .dropdown-mega-menu {
+            background-color: #131c2e;
+            border-color: #24344d;
+        }
+        html[data-bs-theme="dark"] .mega-column-title,
+        html[data-theme="dark"] .mega-column-title {
+            color: #94a3b8;
+            border-color: #24344d;
+        }
+        html[data-bs-theme="dark"] .mega-menu-item,
+        html[data-theme="dark"] .mega-menu-item {
+            color: #cbd5e1;
+        }
+        html[data-bs-theme="dark"] .mega-menu-item:hover,
+        html[data-theme="dark"] .mega-menu-item:hover {
+            background-color: #1a2538;
+        }
+        html[data-bs-theme="dark"] .mega-item-name,
+        html[data-theme="dark"] .mega-item-name {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .mega-item-desc,
+        html[data-theme="dark"] .mega-item-desc {
+            color: #94a3b8;
+        }
+        html[data-bs-theme="dark"] .mega-menu-footer,
+        html[data-theme="dark"] .mega-menu-footer {
+            background-color: #0b1320;
+            border-color: #24344d !important;
+        }
+
+        html[data-bs-theme="dark"] .card,
+        html[data-theme="dark"] .card {
+            background-color: #131c2e;
+            border-color: #24344d;
+            color: #e2e8f0;
+        }
+        html[data-bs-theme="dark"] .card-header,
+        html[data-theme="dark"] .card-header,
+        html[data-bs-theme="dark"] .card-footer,
+        html[data-theme="dark"] .card-footer {
+            background-color: #0e1624;
+            border-color: #24344d;
+        }
+
+        html[data-bs-theme="dark"] .product-card,
+        html[data-theme="dark"] .product-card {
+            background-color: #131c2e;
+            border-color: #24344d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        html[data-bs-theme="dark"] .product-card:hover,
+        html[data-theme="dark"] .product-card:hover {
+            border-color: #16a34a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        html[data-bs-theme="dark"] .product-card-title,
+        html[data-theme="dark"] .product-card-title,
+        html[data-bs-theme="dark"] .product-title,
+        html[data-theme="dark"] .product-title {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .product-card-price,
+        html[data-theme="dark"] .product-card-price,
+        html[data-bs-theme="dark"] .product-price,
+        html[data-theme="dark"] .product-price {
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .product-card-cat,
+        html[data-theme="dark"] .product-card-cat {
+            color: #94a3b8;
+        }
+
+        html[data-bs-theme="dark"] .section-header h2,
+        html[data-theme="dark"] .section-header h2 {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .section-header p,
+        html[data-theme="dark"] .section-header p {
+            color: #94a3b8;
+        }
+
+        html[data-bs-theme="dark"] .footer-nham,
+        html[data-theme="dark"] .footer-nham {
+            background-color: #070d18;
+            border-color: #1a2538;
+            color: #94a3b8;
+        }
+        html[data-bs-theme="dark"] .footer-col h5,
+        html[data-theme="dark"] .footer-col h5,
+        html[data-bs-theme="dark"] .footer-col h6,
+        html[data-theme="dark"] .footer-col h6 {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .footer-bottom,
+        html[data-theme="dark"] .footer-bottom {
+            border-color: #1a2538;
+            color: #64748b;
+        }
+
+        html[data-bs-theme="dark"] .bg-light,
+        html[data-theme="dark"] .bg-light,
+        html[data-bs-theme="dark"] .bg-white,
+        html[data-theme="dark"] .bg-white {
+            background-color: #131c2e !important;
+            color: #e2e8f0;
+        }
+        html[data-bs-theme="dark"] .text-dark,
+        html[data-theme="dark"] .text-dark {
+            color: #f8fafc !important;
+        }
+        html[data-bs-theme="dark"] .text-muted,
+        html[data-theme="dark"] .text-muted {
+            color: #94a3b8 !important;
+        }
+        html[data-bs-theme="dark"] .border,
+        html[data-theme="dark"] .border {
+            border-color: #24344d !important;
+        }
+        html[data-bs-theme="dark"] .btn-outline-secondary,
+        html[data-theme="dark"] .btn-outline-secondary {
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+        html[data-bs-theme="dark"] .btn-outline-secondary:hover,
+        html[data-theme="dark"] .btn-outline-secondary:hover {
+            background-color: #1e293b;
+            color: #fff;
+        }
+        html[data-bs-theme="dark"] .form-control,
+        html[data-theme="dark"] .form-control,
+        html[data-bs-theme="dark"] .form-select,
+        html[data-theme="dark"] .form-select {
+            background-color: #0b1320;
+            border-color: #24344d;
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .form-control:focus,
+        html[data-theme="dark"] .form-control:focus,
+        html[data-bs-theme="dark"] .form-select:focus,
+        html[data-theme="dark"] .form-select:focus {
+            background-color: #0e1726;
+            border-color: #16a34a;
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .modal-content,
+        html[data-theme="dark"] .modal-content {
+            background-color: #131c2e;
+            border-color: #24344d;
+            color: #e2e8f0;
+        }
+        html[data-bs-theme="dark"] .modal-header,
+        html[data-theme="dark"] .modal-header,
+        html[data-bs-theme="dark"] .modal-footer,
+        html[data-theme="dark"] .modal-footer {
+            background-color: #0e1624 !important;
+            border-color: #24344d;
+        }
+        html[data-bs-theme="dark"] .list-group-item,
+        html[data-theme="dark"] .list-group-item {
+            background-color: #131c2e;
+            border-color: #24344d;
+            color: #e2e8f0;
+        }
+        html[data-bs-theme="dark"] .table,
+        html[data-theme="dark"] .table {
+            color: #e2e8f0;
+            border-color: #24344d;
+        }
+        html[data-bs-theme="dark"] .table td,
+        html[data-theme="dark"] .table td,
+        html[data-bs-theme="dark"] .table th,
+        html[data-theme="dark"] .table th {
+            border-color: #24344d;
+        }
+
+        /* Navbar Search Dark Mode */
+        html[data-bs-theme="dark"] .navbar-search-results,
+        html[data-theme="dark"] .navbar-search-results {
+            background-color: #131c2e;
+            border-color: #24344d;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+        }
+        html[data-bs-theme="dark"] .navbar-search-result,
+        html[data-theme="dark"] .navbar-search-result {
+            color: #f8fafc;
+            border-bottom-color: #1e293b;
+        }
+        html[data-bs-theme="dark"] .navbar-search-result:hover,
+        html[data-theme="dark"] .navbar-search-result:hover {
+            background-color: #1a273e;
+        }
+        html[data-bs-theme="dark"] .navbar-search-result-title,
+        html[data-theme="dark"] .navbar-search-result-title {
+            color: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .navbar-search-empty,
+        html[data-theme="dark"] .navbar-search-empty,
+        html[data-bs-theme="dark"] .navbar-search-loading,
+        html[data-theme="dark"] .navbar-search-loading {
+            color: #94a3b8;
+        }
     </style>
 
     @stack('styles')
@@ -725,25 +1234,34 @@
 
             <!-- BRAND -->
             <a class="navbar-brand-custom" href="{{ url('/') }}">
-                <div class="brand-icon">
-                    <i class="fas fa-store"></i>
-                </div>
-                24/7 NHAM
+                <img src="{{ asset('img/logo.png') }}" alt="24/7 NHAM" class="brand-logo-img">
+                <span style="font-weight: 800; font-size: 1.18rem; letter-spacing: -0.4px; color: var(--green-dark);">24/7 NHAM</span>
             </a>
 
-            <!-- MOBILE TOGGLE -->
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
-                data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- MOBILE ACTIONS (THEME TOGGLE & BURGER) -->
+            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto me-1">
+                <button type="button" 
+                        class="btn btn-outline-secondary btn-sm rounded-3 p-1 theme-toggle-btn d-flex align-items-center justify-content-center" 
+                        id="mobileThemeToggleBtn"
+                        style="width: 36px; height: 36px;"
+                        title="Toggle Light / Dark Mode" 
+                        aria-label="Toggle theme">
+                    <i class="bi bi-moon-stars-fill theme-icon-dark text-warning" style="font-size: 1.05rem;"></i>
+                    <i class="bi bi-sun-fill theme-icon-light text-warning" style="font-size: 1.05rem;"></i>
+                </button>
+                <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
 
             <div class="collapse navbar-collapse" id="mainNav">
 
                 <!-- NAVIGATION -->
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('/') || request()->is('list') ? 'active' : '' }}"
-                            href="{{ url('/list') }}">
+                        <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
+                            href="{{ url('/') }}">
                             Home
                         </a>
                     </li>
@@ -761,65 +1279,243 @@
                         </a>
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            Shop
+                    <li class="nav-item dropdown dropdown-mega position-static">
+                        <a class="nav-link dropdown-toggle d-inline-flex align-items-center gap-1 {{ request()->routeIs('order.track*') || request()->routeIs('customer.orders*') || request()->is('list*') ? 'active' : '' }}" 
+                           href="#" 
+                           id="shopMegaDropdown" 
+                           role="button" 
+                           data-bs-toggle="dropdown" 
+                           data-bs-display="static" 
+                           aria-expanded="false">
+                            <span>Shop</span>
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-1 py-0 ms-1 fw-bold" style="font-size: 0.65rem;">MEGA</span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list') }}">
-                                    <i class="fas fa-th-large me-2 text-success"></i> All Products
+                        <div class="dropdown-menu dropdown-mega-menu shadow-lg border-0" aria-labelledby="shopMegaDropdown">
+                            <div class="row g-3 g-lg-4">
+                                <!-- Column 1: Quick Services & Orders -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mega-column-title">
+                                        <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Services
+                                    </div>
+                                    <div class="d-flex flex-column gap-1">
+                                        <a class="mega-menu-item {{ request()->is('list') && !request('category') ? 'active' : '' }}" href="{{ url('/list') }}">
+                                            <div class="mega-item-icon bg-success-subtle text-success">
+                                                <i class="fas fa-th-large"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <div class="mega-item-name">All Products</div>
+                                                <div class="mega-item-desc">Browse full food & drink catalog</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request()->routeIs('order.track*') ? 'active' : '' }}" href="{{ route('order.track') }}">
+                                            <div class="mega-item-icon bg-primary-subtle text-primary">
+                                                <i class="bi bi-truck"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="mega-item-name">Track Order</span>
+                                                    <span class="badge bg-primary text-white rounded-pill" style="font-size: 0.6rem;">LIVE GPS</span>
+                                                </div>
+                                                <div class="mega-item-desc">5-stage real-time delivery map</div>
+                                            </div>
+                                        </a>
+
+                                        @auth
+                                        <a class="mega-menu-item {{ request()->routeIs('customer.orders*') ? 'active' : '' }}" href="{{ route('customer.orders.index') }}">
+                                            <div class="mega-item-icon bg-warning-subtle text-warning">
+                                                <i class="bi bi-clock-history"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="mega-item-name">My Orders</span>
+                                                    <span class="badge bg-warning-subtle text-warning-emphasis border rounded-pill" style="font-size: 0.6rem;">History</span>
+                                                </div>
+                                                <div class="mega-item-desc">Past receipts, invoices & reorder</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request()->routeIs('favorites*') ? 'active' : '' }}" href="{{ route('favorites.index') }}">
+                                            <div class="mega-item-icon bg-danger-subtle text-danger">
+                                                <i class="bi bi-heart-fill"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Favorite Dishes</span>
+                                                <div class="mega-item-desc">Your saved meals & snacks</div>
+                                            </div>
+                                        </a>
+                                        @endauth
+
+                                        <a class="mega-menu-item" href="{{ route('support.chat') }}">
+                                            <div class="mega-item-icon bg-info-subtle text-info">
+                                                <i class="bi bi-headset"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">24/7 Live Support</span>
+                                                <div class="mega-item-desc">Instant delivery help & chat</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: Meals & Mains -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mega-column-title">
+                                        <i class="fas fa-utensils text-success me-1"></i> Meals & Mains
+                                    </div>
+                                    <div class="d-flex flex-column gap-1">
+                                        <a class="mega-menu-item {{ request('category') == 'food' ? 'active' : '' }}" href="{{ url('/list?category=food') }}">
+                                            <div class="mega-item-icon bg-warning-subtle text-warning">
+                                                <i class="fas fa-utensils"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Food & Hot Meals</span>
+                                                <div class="mega-item-desc">Cooked rice, stir fries & soups</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'fast-food' ? 'active' : '' }}" href="{{ url('/list?category=fast-food') }}">
+                                            <div class="mega-item-icon bg-danger-subtle text-danger">
+                                                <i class="fas fa-hamburger"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="mega-item-name">Fast Food</span>
+                                                    <span class="badge bg-danger text-white rounded-pill" style="font-size: 0.58rem;">HOT</span>
+                                                </div>
+                                                <div class="mega-item-desc">Burgers, crispy chicken & fries</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'sea-food' ? 'active' : '' }}" href="{{ url('/list?category=sea-food') }}">
+                                            <div class="mega-item-icon bg-primary-subtle text-primary">
+                                                <i class="fas fa-fish"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Sea Food</span>
+                                                <div class="mega-item-desc">Fresh prawns, squid & fish</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'snacks' ? 'active' : '' }}" href="{{ url('/list?category=snacks') }}">
+                                            <div class="mega-item-icon bg-secondary-subtle text-secondary">
+                                                <i class="fas fa-cookie"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Snacks & Bites</span>
+                                                <div class="mega-item-desc">Chips, biscuits & nibbles</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Column 3: Beverages & Sweet Treats -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mega-column-title">
+                                        <i class="fas fa-glass-cheers text-info me-1"></i> Drinks & Treats
+                                    </div>
+                                    <div class="d-flex flex-column gap-1">
+                                        <a class="mega-menu-item {{ request('category') == 'drink' ? 'active' : '' }}" href="{{ url('/list?category=drink') }}">
+                                            <div class="mega-item-icon bg-info-subtle text-info">
+                                                <i class="fas fa-mug-hot"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Coffee & Tea</span>
+                                                <div class="mega-item-desc">Iced latte, milk tea & matcha</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'beverage' ? 'active' : '' }}" href="{{ url('/list?category=beverage') }}">
+                                            <div class="mega-item-icon bg-primary-subtle text-primary">
+                                                <i class="fas fa-glass-water"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Beverages</span>
+                                                <div class="mega-item-desc">Sodas, fruit juices & waters</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'beer' ? 'active' : '' }}" href="{{ url('/list?category=beer') }}">
+                                            <div class="mega-item-icon bg-warning-subtle text-warning">
+                                                <i class="fas fa-beer-mug-empty"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="mega-item-name">Beer & Cider</span>
+                                                    <span class="badge bg-secondary text-white rounded-pill" style="font-size: 0.58rem;">ICE COLD</span>
+                                                </div>
+                                                <div class="mega-item-desc">Lagers, drafts & craft cans</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'milk' ? 'active' : '' }}" href="{{ url('/list?category=milk') }}">
+                                            <div class="mega-item-icon bg-success-subtle text-success">
+                                                <i class="fas fa-glass-whiskey"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Milk & Shakes</span>
+                                                <div class="mega-item-desc">Pure dairy, yogurts & shakes</div>
+                                            </div>
+                                        </a>
+
+                                        <a class="mega-menu-item {{ request('category') == 'ice-cream' ? 'active' : '' }}" href="{{ url('/list?category=ice-cream') }}">
+                                            <div class="mega-item-icon bg-danger-subtle text-danger">
+                                                <i class="fas fa-ice-cream"></i>
+                                            </div>
+                                            <div class="mega-item-text">
+                                                <span class="mega-item-name">Ice Cream</span>
+                                                <div class="mega-item-desc">Scoops, gelato & ice pops</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Column 4: Promo & Fast Delivery Card -->
+                                <div class="col-12 col-md-6 col-lg-3">
+                                    <div class="mega-promo-card h-100 d-flex flex-column justify-content-between p-3 p-xl-4 rounded-4">
+                                        <div>
+                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="{{ asset('img/logo.png') }}" alt="24/7 NHAM" style="height: 32px; width: auto; object-fit: contain;">
+                                                    <span class="fw-bold text-white small" style="letter-spacing: -0.2px;">24/7 NHAM</span>
+                                                </div>
+                                                <span class="badge bg-white text-success fw-bold px-2 py-1" style="font-size: 0.65rem;">OPEN 24/7</span>
+                                            </div>
+                                            <h6 class="fw-bolder text-white mb-1" style="font-size: 1.02rem;">Hungry? We Deliver!</h6>
+                                            <p class="text-white-50 small mb-3" style="font-size: 0.77rem; line-height: 1.45;">
+                                                Fast 20-35 mins delivery directly to your door across Phnom Penh.
+                                            </p>
+                                            <div class="p-2 rounded-3 mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <span class="text-white-50" style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px;">PROMO CODE</span>
+                                                    <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.62rem;">10% OFF</span>
+                                                </div>
+                                                <div class="fw-bolder text-warning font-monospace mt-1" style="font-size: 0.95rem; letter-spacing: 1px;">WELCOME10</div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url('/list') }}" class="btn btn-light btn-sm w-100 fw-bold text-success rounded-pill py-2 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                                <span>Order Now</span>
+                                                <i class="bi bi-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mega Menu Bottom Bar -->
+                            <div class="mega-menu-footer mt-3 pt-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="d-flex flex-wrap align-items-center gap-3 text-muted" style="font-size: 0.76rem;">
+                                    <span><i class="bi bi-shield-check text-success me-1"></i> Contactless Delivery</span>
+                                    <span><i class="bi bi-stopwatch text-primary me-1"></i> Avg 25 Mins</span>
+                                    <span><i class="bi bi-credit-card-2-front text-warning me-1"></i> Cash on Delivery & Stripe</span>
+                                </div>
+                                <a href="{{ url('/frontend') }}" class="text-success fw-bold text-decoration-none small d-inline-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                    <span>Browse All Categories</span>
+                                    <i class="bi bi-chevron-right"></i>
                                 </a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider my-1">
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=drink') }}">
-                                    <i class="fas fa-mug-hot me-2 text-info"></i> Drinks
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=food') }}">
-                                    <i class="fas fa-utensils me-2 text-warning"></i> Food
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=beer') }}">
-                                    <i class="fas fa-beer-mug-empty me-2 text-warning"></i> Beer
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=sea-food') }}">
-                                    <i class="fas fa-fish me-2 text-primary"></i> Sea Food
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=ice-cream') }}">
-                                    <i class="fas fa-ice-cream me-2 text-danger"></i> Ice Cream
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=snacks') }}">
-                                    <i class="fas fa-cookie me-2 text-danger"></i> Snacks
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=fast-food') }}">
-                                    <i class="fas fa-hamburger me-2 text-danger"></i> Fast Food
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=beverage') }}">
-                                    <i class="fas fa-glass-water me-2 text-danger"></i> Beverage
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url('/list?category=milk') }}">
-                                    <i class="fas fa-glass-whiskey me-2 text-danger"></i> Milk
-                                </a>
-                            </li>
-                        </ul>
+                            </div>
+                        </div>
                     </li>
                 </ul>
 
@@ -854,19 +1550,123 @@
                         @endif
                     </a>
 
+                    @auth
+                        <!-- FAVORITES -->
+                        <a href="{{ route('favorites.index') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center rounded-3 p-2" style="width: 38px; height: 38px;" title="My Favorites">
+                            <i class="bi bi-heart-fill text-danger"></i>
+                        </a>
+
+                        <!-- NOTIFICATIONS BELL -->
+                        <a href="{{ route('notifications.index') }}" class="btn btn-outline-secondary position-relative d-flex align-items-center justify-content-center rounded-3 p-2" style="width: 38px; height: 38px;" title="Notifications">
+                            <i class="bi bi-bell-fill text-secondary"></i>
+                            <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none; font-size: 0.65rem;">
+                                0
+                            </span>
+                        </a>
+                    @endauth
+
+                    <!-- THEME TOGGLE (LIGHT / DARK) DESKTOP -->
+                    <button type="button" 
+                            class="btn btn-outline-secondary d-none d-lg-flex align-items-center justify-content-center rounded-3 p-2 theme-toggle-btn" 
+                            id="desktopThemeToggleBtn"
+                            style="width: 38px; height: 38px;" 
+                            title="Toggle Light / Dark Mode" 
+                            aria-label="Toggle theme">
+                        <i class="bi bi-moon-stars-fill theme-icon-dark text-warning"></i>
+                        <i class="bi bi-sun-fill theme-icon-light text-warning"></i>
+                    </button>
+
                     <!-- LOGIN / LOGOUT -->
                     @guest
                         <a href="{{ route('login') }}" class="btn-nav-login">
                             Login
                         </a>
                     @else
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn-nav-logout border-0">
-                                <i class="bi bi-box-arrow-right me-1"></i>
-                                Logout
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 rounded-3 py-1 px-2 px-md-3" 
+                                    type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: .84rem; font-weight: 600;">
+                                @if(auth()->user()->avatar)
+                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle object-fit-cover border" style="width: 24px; height: 24px;">
+                                @else
+                                    <i class="bi bi-person-circle text-success fs-6"></i>
+                                @endif
+                                <span class="d-none d-md-inline text-dark">{{ auth()->user()->name }}</span>
                             </button>
-                        </form>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 p-2" style="min-width: 220px;">
+                                <li class="px-3 py-2 border-bottom mb-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle border object-fit-cover" style="width: 36px; height: 36px;">
+                                        <div style="min-width: 0;">
+                                            <div class="fw-bold text-dark small text-truncate">{{ auth()->user()->name }}</div>
+                                            <div class="text-muted text-truncate" style="font-size: .72rem;">{{ auth()->user()->email }}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                @if(auth()->user()->isDriver())
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2 fw-semibold text-success bg-success-subtle mb-1" href="{{ route('driver.dashboard') }}">
+                                        <i class="bi bi-bicycle me-2 text-success"></i> Courier Portal
+                                    </a>
+                                </li>
+                                @endif
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('customer.orders.index') }}">
+                                        <i class="bi bi-clock-history me-2 text-primary"></i> My Order History
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('order.track') }}">
+                                        <i class="bi bi-truck me-2 text-success"></i> Track Shipments
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('favorites.index') }}">
+                                        <i class="bi bi-heart me-2 text-danger"></i> Saved Favorites
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('notifications.index') }}">
+                                        <i class="bi bi-bell me-2 text-secondary"></i> Notifications
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('support.chat') }}">
+                                        <i class="bi bi-headset me-2 text-info"></i> Support & Chat
+                                    </a>
+                                </li>
+                                @if(auth()->user()->role === 'admin')
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('dashboard') }}">
+                                        <i class="bi bi-speedometer2 me-2 text-warning"></i> Admin Dashboard
+                                    </a>
+                                </li>
+                                @endif
+                                <li>
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('profile.edit', auth()->id()) }}">
+                                        <i class="bi bi-gear me-2 text-secondary"></i> Account Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item py-2 rounded-2 theme-toggle-btn d-flex align-items-center justify-content-between border-0 bg-transparent w-100">
+                                        <span>
+                                            <i class="bi bi-moon-stars-fill text-warning me-2 theme-icon-dark"></i>
+                                            <i class="bi bi-sun-fill text-warning me-2 theme-icon-light"></i>
+                                            <span class="theme-dropdown-label">Dark Mode</span>
+                                        </span>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill small theme-dropdown-badge" style="font-size: 0.68rem;">Theme</span>
+                                    </button>
+                                </li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 rounded-2 text-danger border-0 bg-transparent w-100 text-start">
+                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     @endguest
 
                 </div>
@@ -899,10 +1699,11 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="footer-brand">
-                        <i class="fas fa-store me-2"></i> 24/7 NHAM
+                    <div class="footer-brand d-flex align-items-center gap-2">
+                        <img src="{{ asset('img/logo.png') }}" alt="24/7 NHAM" style="height: 38px; width: auto; object-fit: contain; background: #fff; padding: 2px; border-radius: 8px;">
+                        <span style="font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; color: #fff;">24/7 NHAM</span>
                     </div>
-                    <p class="footer-tagline">Your go-to store for food, drinks & more.</p>
+                    <p class="footer-tagline mt-2">Your go-to store for food, drinks & more.</p>
                 </div>
 
                 <div class="col-md-4">
@@ -921,11 +1722,13 @@
                             <a href="{{ route('login') }}">Login</a>
                             <a href="{{ route('register') }}">Register</a>
                         @else
+                            <a href="{{ route('customer.orders.index') }}">My Order History</a>
                             <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                 @csrf
-                                <button type="submit" class="btn btn-link p-0 text-white text-decoration-none">Logout</button>
+                                <button type="submit" class="btn btn-link p-0 text-white text-decoration-none" style="font-size: .82rem;">Logout</button>
                             </form>
                         @endguest
+                        <a href="{{ route('order.track') }}">Track Shipments</a>
                         <a href="{{ route('cart') }}">My Cart</a>
                     </div>
                 </div>
@@ -984,8 +1787,15 @@
                 searchResults.classList.add('show');
             }
 
+            function highlightMatch(text, query) {
+                if (!query) return escapeHtml(text);
+                const safe = escapeHtml(text);
+                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return safe.replace(new RegExp(`(${escapedQuery})`, 'gi'), '<strong class="text-success">$1</strong>');
+            }
+
             /* =====================================================
-               INPUT EVENT
+               INPUT EVENT: Begins search as soon as characters are typed
             ===================================================== */
             searchInput.addEventListener('input', function () {
                 const keyword = this.value.trim();
@@ -997,19 +1807,9 @@
                     return;
                 }
 
-                if (keyword.length < 2) {
-                    searchResults.innerHTML = `
-                        <div class="navbar-search-empty">
-                            <i class="bi bi-search"></i>
-                            Type at least 2 characters
-                        </div>`;
-                    showSearchResults();
-                    return;
-                }
-
                 searchResults.innerHTML = `
                     <div class="navbar-search-loading">
-                        <i class="bi bi-arrow-repeat me-1"></i>
+                        <i class="bi bi-arrow-repeat me-1 spin"></i>
                         Searching products...
                     </div>`;
                 showSearchResults();
@@ -1042,7 +1842,8 @@
                         }
 
                         products.forEach(product => {
-                            const result = document.createElement('div');
+                            const result = document.createElement('a');
+                            result.href = product.url;
                             result.className = 'navbar-search-result';
                             result.setAttribute('data-title', product.title);
 
@@ -1051,15 +1852,17 @@
                                 priceHtml = `<span class="navbar-search-result-price">$${escapeHtml(product.price)}</span>`;
                             }
 
+                            const imgHtml = product.image
+                                ? `<img src="${escapeHtml(product.image)}" alt="${escapeHtml(product.title)}" class="rounded object-fit-cover" style="width:36px;height:36px;" onerror="this.onerror=null;this.src='{{ asset('img/logo.png') }}';">`
+                                : `<div class="navbar-search-result-icon"><i class="bi bi-box-seam"></i></div>`;
+
                             result.innerHTML = `
-                                <div class="navbar-search-result-icon">
-                                    <i class="bi bi-box-seam"></i>
-                                </div>
+                                ${imgHtml}
                                 <div class="navbar-search-result-info">
-                                    <span class="navbar-search-result-title">${escapeHtml(product.title)}</span>
+                                    <span class="navbar-search-result-title">${highlightMatch(product.title, keyword)}</span>
                                     ${priceHtml}
                                 </div>
-                                <i class="bi bi-chevron-right text-muted"></i>
+                                <i class="bi bi-chevron-right text-muted ms-auto small"></i>
                             `;
 
                             searchResults.appendChild(result);
@@ -1076,15 +1879,21 @@
                             </div>`;
                         showSearchResults();
                     });
-                }, 300);
+                }, 120);
             });
 
             /* =====================================================
-               FOCUS & BLUR
+               FOCUS & BLUR & KEYBOARD
             ===================================================== */
             searchInput.addEventListener('focus', function () {
-                if (this.value.trim().length >= 2 && searchResults.innerHTML.trim() !== '') {
+                if (this.value.trim().length >= 1 && searchResults.innerHTML.trim() !== '') {
                     showSearchResults();
+                }
+            });
+
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeSearchResults();
                 }
             });
 
@@ -1092,22 +1901,6 @@
                 const wrapper = document.querySelector('.navbar-search-wrapper');
                 if (wrapper && !wrapper.contains(event.target)) {
                     closeSearchResults();
-                }
-            });
-
-            /* =====================================================
-               AUTO-FILL SEARCH INPUT ON RESULT CLICK
-            ===================================================== */
-            searchResults.addEventListener('click', function (event) {
-                const resultItem = event.target.closest('.navbar-search-result');
-                if (resultItem) {
-                    const productTitle = resultItem.getAttribute('data-title');
-                    if (productTitle) {
-                        searchInput.value = productTitle;
-                        closeSearchResults();
-                        // Submit form automatically upon selection
-                        searchForm.submit(); 
-                    }
                 }
             });
 
@@ -1124,6 +1917,93 @@
                 closeSearchResults();
             });
         });
+    </script>
+
+    @auth
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const badge = document.getElementById('notifBadge');
+            function checkUnreadNotifications() {
+                fetch('{{ route("notifications.unread") }}')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (badge) {
+                            if (data.count > 0) {
+                                badge.textContent = data.count > 99 ? '99+' : data.count;
+                                badge.style.display = 'inline-block';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(err => {});
+            }
+            checkUnreadNotifications();
+            setInterval(checkUnreadNotifications, 8000);
+        });
+    </script>
+    @endauth
+
+    <!-- =========================================================
+         LIGHT / DARK MODE CONTROLLER
+    ========================================================= -->
+    <script>
+        (function () {
+            function getPreferredTheme() {
+                const stored = localStorage.getItem('nham_theme');
+                if (stored === 'dark' || stored === 'light') {
+                    return stored;
+                }
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.setAttribute('data-theme', theme);
+                const metaTheme = document.querySelector('meta[name="color-scheme"]');
+                if (metaTheme) {
+                    metaTheme.content = theme;
+                }
+                const isDark = theme === 'dark';
+                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                    btn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+                    btn.setAttribute('aria-label', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+                });
+                document.querySelectorAll('.theme-dropdown-label').forEach(el => {
+                    el.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+                });
+                document.querySelectorAll('.theme-dropdown-badge').forEach(el => {
+                    el.textContent = isDark ? 'Dark' : 'Light';
+                });
+            }
+
+            function toggleTheme(e) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                const current = document.documentElement.getAttribute('data-bs-theme') || getPreferredTheme();
+                const newTheme = current === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('nham_theme', newTheme);
+                applyTheme(newTheme);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                    btn.addEventListener('click', toggleTheme);
+                });
+
+                // Set initial label/badge text
+                applyTheme(getPreferredTheme());
+
+                // React to OS changes if not explicitly overridden by user
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                    if (!localStorage.getItem('nham_theme')) {
+                        applyTheme(e.matches ? 'dark' : 'light');
+                    }
+                });
+            });
+        })();
     </script>
 
     @stack('scripts')

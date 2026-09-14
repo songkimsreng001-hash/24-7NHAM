@@ -137,15 +137,15 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 {{-- FIX: was img/{{ image }} (missing asset()), broke on some servers --}}
-                                                @if($details['image'])
-                                                    <img src="{{ asset('img/' . $details['image']) }}"
-                                                         alt="{{ $details['name'] }}" class="cart-product-img">
-                                                @else
-                                                    <div class="cart-product-img d-flex align-items-center justify-content-center"
-                                                         style="background:#f0fdf4; color:#16a34a; font-size:1.4rem;">
-                                                        <i class="fas fa-box"></i>
-                                                    </div>
-                                                @endif
+                                                @php
+                                                    $cartImg = $details['image_url'] ?? (
+                                                        !empty($details['image'])
+                                                            ? (str_starts_with($details['image'], 'http') ? $details['image'] : asset('img/' . $details['image']))
+                                                            : asset('img/logo.png')
+                                                    );
+                                                @endphp
+                                                <img src="{{ $cartImg }}"
+                                                     alt="{{ $details['name'] }}" class="cart-product-img">
                                                 <div class="cart-product-name">{{ $details['name'] }}</div>
                                             </div>
                                         </td>

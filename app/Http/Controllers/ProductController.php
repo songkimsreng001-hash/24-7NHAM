@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Product;
-use Illuminate\Support\Facades\File;
+
 class ProductController extends Controller
 {
     /**
@@ -15,7 +16,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-         $products = Product::all();
+        $products = Product::all();
+
         return view('product.index')->with('products', $products);
     }
 
@@ -24,10 +26,11 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = array();
+        $categories = [];
         foreach (Category::all() as $category) {
             $categories[$category->id] = $category->name;
         }
+
         return view('product.create')->with('categories', $categories);
     }
 
@@ -54,10 +57,10 @@ class ProductController extends Controller
         $image = $request->file('image');
         $upload = 'img/';
         $extension = substr($image->getClientOriginalName(), -4);
-        $filename = substr($image->getClientOriginalName(), 0, -4) . time() . $extension;
-        move_uploaded_file($image->getPathName(), $upload . $filename);
+        $filename = substr($image->getClientOriginalName(), 0, -4).time().$extension;
+        move_uploaded_file($image->getPathName(), $upload.$filename);
 
-        $product = new Product();
+        $product = new Product;
         $product->name = $request->name;
         $product->category_id = $request->category_id;
         $product->price = $request->price;
@@ -65,6 +68,7 @@ class ProductController extends Controller
         $product->description = $request->description;
         $product->save();
         Session::flash('product_create', 'New data is created.');
+
         return redirect('product/create');
     }
 
@@ -74,6 +78,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::findOrFail($id);
+
         return view('product.show')->with('product', $product);
     }
 
@@ -82,11 +87,12 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $categories = array();
+        $categories = [];
         foreach (Category::all() as $category) {
             $categories[$category->id] = $category->name;
         }
         $product = Product::findOrFail($id);
+
         return view('product.edit')->with('product', $product)->with('categories', $categories);
     }
 
@@ -104,17 +110,17 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('product/' . $id . '/edit')
+            return redirect('product/'.$id.'/edit')
                 ->withInput()
                 ->withErrors($validator);
         }
         $product = Product::find($id);
         // Create The Post
-        if ($request->file('image') != "") {
+        if ($request->file('image') != '') {
             $image = $request->file('image');
             $upload = 'img/';
-            $filename = time() . $image->getClientOriginalName();
-            move_uploaded_file($image->getPathName(), $upload . $filename);
+            $filename = time().$image->getClientOriginalName();
+            move_uploaded_file($image->getPathName(), $upload.$filename);
         }
 
         $product->name = $request->Input('name');
@@ -128,7 +134,8 @@ class ProductController extends Controller
         $product->save();
 
         Session::flash('product_update', 'Data is updated');
-        return redirect('product/' . $product->id . '/edit');
+
+        return redirect('product/'.$product->id.'/edit');
     }
 
     /**
@@ -140,7 +147,8 @@ class ProductController extends Controller
         $image_path = 'img/'.$product->image;
         File::delete($image_path);
         $product->delete();
-        Session::flash('product_delete','Data is deleted.');
+        Session::flash('product_delete', 'Data is deleted.');
+
         return redirect('product');
     }
 }

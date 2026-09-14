@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Book;
 
 class BookController extends Controller
 {
@@ -28,7 +28,7 @@ class BookController extends Controller
             'Title' => 'required|min:3|max:255',
             'Author' => 'required|min:3|max:150',
             'ISBN' => 'required|unique:books,ISBN',
-            'PublishYear' => 'required|digits:4'
+            'PublishYear' => 'required|digits:4',
         ]);
 
         if ($validator->fails()) {
@@ -37,7 +37,7 @@ class BookController extends Controller
                 ->withErrors($validator);
         }
 
-        $book = new Book();
+        $book = new Book;
 
         $book->Title = $request->Title;
         $book->Author = $request->Author;
@@ -73,11 +73,11 @@ class BookController extends Controller
             'Title' => 'required|min:3|max:255',
             'Author' => 'required|min:3|max:150',
             'ISBN' => 'required',
-            'PublishYear' => 'required|digits:4'
+            'PublishYear' => 'required|digits:4',
         ]);
 
         if ($validator->fails()) {
-            return redirect('book/' . $id . '/edit')
+            return redirect('book/'.$id.'/edit')
                 ->withInput()
                 ->withErrors($validator);
         }
@@ -93,7 +93,7 @@ class BookController extends Controller
 
         Session::flash('book_update', 'Book updated successfully.');
 
-        return redirect('book/' . $id . '/edit');
+        return redirect('book/'.$id.'/edit');
     }
 
     public function destroy($id)

@@ -13,8 +13,17 @@
 
     <div class="card-body p-0">
         @if (count($categories) > 0)
+            <div class="px-3 py-2 border-bottom bg-light bg-opacity-50 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="input-group input-group-sm" style="max-width: 360px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="categoryTableFilter" class="form-control border-start-0" placeholder="Filter categories by ID or name..." autocomplete="off">
+                </div>
+                <span id="categoryTableFilterCount" class="badge bg-secondary-subtle text-secondary border fw-medium px-2 py-1">
+                    {{ count($categories) }} categories
+                </span>
+            </div>
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table id="categoryTable" class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th class="text-center" width="80">ID</th>
@@ -93,7 +102,44 @@
                     }
                 });
             });
-        });
+        // Automatic Instant Table Search as soon as characters are typed
+        const categoryTableFilter = document.getElementById('categoryTableFilter');
+        const categoryTableFilterCount = document.getElementById('categoryTableFilterCount');
+        const categoryRows = document.querySelectorAll('#categoryTable tbody tr');
+
+        if (categoryTableFilter) {
+            categoryTableFilter.addEventListener('input', function () {
+                const q = this.value.trim().toLowerCase();
+                let matched = 0;
+
+                categoryRows.forEach(row => {
+                    if (row.id === 'categoryNoMatchRow') return;
+                    const text = row.innerText.toLowerCase();
+                    const match = !q || text.includes(q);
+                    row.style.display = match ? '' : 'none';
+                    if (match) matched++;
+                });
+
+                if (categoryTableFilterCount) {
+                    categoryTableFilterCount.textContent = q 
+                        ? `${matched} of ${categoryRows.length} matches` 
+                        : `${categoryRows.length} categories`;
+                }
+
+                let noMatchRow = document.getElementById('categoryNoMatchRow');
+                if (matched === 0 && q) {
+                    if (!noMatchRow) {
+                        noMatchRow = document.createElement('tr');
+                        noMatchRow.id = 'categoryNoMatchRow';
+                        noMatchRow.innerHTML = `<td colspan="3" class="text-center py-4 text-muted"><i class="bi bi-search me-1"></i>No categories found matching "${this.value}"</td>`;
+                        document.querySelector('#categoryTable tbody').appendChild(noMatchRow);
+                    }
+                    noMatchRow.style.display = '';
+                } else if (noMatchRow) {
+                    noMatchRow.style.display = 'none';
+                }
+            });
+        }
 
         // Trigger SweetAlert2 Toast on Success Flash Message
         @if(Session::has('category_delete'))

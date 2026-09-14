@@ -36,7 +36,7 @@
                     <!-- Product Image -->
                     <div class="col-md-4 text-center mb-4 mb-md-0">
                         <div class="p-2 border rounded bg-light">
-                            <img src="{{ asset('img/'.$product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded shadow-sm" style="max-height: 250px; width: 100%; object-fit: cover;" />
+                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="img-fluid rounded shadow-sm" style="max-height: 250px; width: 100%; object-fit: cover;" />
                         </div>
                     </div>
 
