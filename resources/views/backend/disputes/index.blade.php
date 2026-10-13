@@ -1,6 +1,5 @@
 @extends('layout.backend')
 
-@section('page-title', 'Dispute Resolution Center - 24/7 NHAM Admin')
 
 @section('content')
 <div class="page-header">

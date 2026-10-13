@@ -1,7 +1,5 @@
 @extends('layout.frontend')
 
-@section('title', 'My Favorites - 24/7 NHAM')
-
 @section('content')
 <div class="container py-4 py-md-5">
     

@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', 'Featured Products — 24/7 NHAM')
+
 
 @section('content')
 

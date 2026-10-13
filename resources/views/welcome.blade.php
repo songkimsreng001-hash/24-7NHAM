@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', 'Welcome to 24/7 NHAM — Delivery Platform')
+
 
 @section('content')
 <div class="container py-5">

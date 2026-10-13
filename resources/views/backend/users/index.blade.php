@@ -1,6 +1,5 @@
 @extends('layout.backend')
 
-@section('page-title', 'User & Driver Management - 24/7 NHAM Admin')
 
 @push('styles')
 <style>

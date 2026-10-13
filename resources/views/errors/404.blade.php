@@ -1,5 +1,4 @@
 @extends('layout.frontend')
-@section('page-title', '404 — Page Not Found')
 @section('content')
 <div class="container py-5">
     <div class="text-center py-5">

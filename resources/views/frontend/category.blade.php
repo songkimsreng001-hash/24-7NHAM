@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', ($selectedCategory ? $selectedCategory->name . ' — ' : '') . 'Categories — 24/7 NHAM')
+
 
 @section('content')
 

@@ -7,7 +7,7 @@
     <meta name="description" content="24/7 NHAM — Food, Drinks & More" />
     <meta name="color-scheme" content="light dark" />
 
-    <title>@yield('page-title', '24/7 NHAM')</title>
+    <title>24/7 NHAM</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
 
     <script>
@@ -1288,7 +1288,7 @@
                            data-bs-display="static" 
                            aria-expanded="false">
                             <span>Shop</span>
-                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-1 py-0 ms-1 fw-bold" style="font-size: 0.65rem;">MEGA</span>
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-1 py-0 ms-1 fw-bold" style="font-size: 0.65rem;"></span>
                         </a>
                         <div class="dropdown-menu dropdown-mega-menu shadow-lg border-0" aria-labelledby="shopMegaDropdown">
                             <div class="row g-3 g-lg-4">

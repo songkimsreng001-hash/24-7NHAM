@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', ($product->name ?? 'Product') . ' — 24/7 NHAM')
+
 
 @section('content')
 <div class="container" style="padding-top:40px; padding-bottom:64px;">

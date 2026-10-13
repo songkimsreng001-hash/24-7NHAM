@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', 'Track Order #' . $order->id . ' — 24/7 NHAM')
+
 
 @section('content')
 <div class="container py-4 py-lg-5">

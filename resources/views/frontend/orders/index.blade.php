@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', 'My Order History — 24/7 NHAM')
+
 
 @section('content')
 <div class="container py-4 py-lg-5">

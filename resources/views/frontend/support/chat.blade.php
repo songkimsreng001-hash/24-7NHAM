@@ -1,7 +1,5 @@
 @extends('layout.frontend')
 
-@section('title', '24/7 NHAM Support Chat')
-
 @section('content')
 <div class="container py-4 py-md-5">
     <div class="row justify-content-center">

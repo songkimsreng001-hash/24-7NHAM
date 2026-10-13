@@ -1,5 +1,5 @@
 @extends('layout.frontend')
-@section('page-title', 'Cart — 24/7 NHAM')
+
 
 @push('styles')
 <style>

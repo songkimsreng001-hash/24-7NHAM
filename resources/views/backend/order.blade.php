@@ -1,5 +1,4 @@
 @extends('layout.backend')
-@section('title', 'ORDERS & SHIPMENT MANAGEMENT')
 
 @section('content')
 <div class="card shadow-sm border-0 mb-4">

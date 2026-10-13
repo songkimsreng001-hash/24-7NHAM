@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="color-scheme" content="light dark">
-    <title>@yield('page-title', '24/7 NHAM Admin')</title>
+    <title>24/7 NHAM Admin</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
 
     <script>

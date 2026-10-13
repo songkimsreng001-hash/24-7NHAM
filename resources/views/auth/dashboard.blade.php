@@ -1,6 +1,5 @@
 @extends('layout.backend')
 
-@section('page-title', 'Dashboard — 24/7 NHAM')
 
 @push('styles')
 <style>
