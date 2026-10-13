@@ -26,10 +26,14 @@ putenv('APP_SERVICES_CACHE=/tmp/services.php');
 // SQLite support in serverless: copy project database to writable /tmp if using sqlite
 $dbSource = __DIR__ . '/../database/database.sqlite';
 $dbTarget = '/tmp/database.sqlite';
-if (!file_exists($dbTarget) && file_exists($dbSource)) {
-    @copy($dbSource, $dbTarget);
+if (!file_exists($dbTarget)) {
+    if (file_exists($dbSource)) {
+        @copy($dbSource, $dbTarget);
+    } else {
+        @touch($dbTarget);
+    }
 }
-if (file_exists($dbTarget) && (getenv('DB_CONNECTION') === 'sqlite' || !getenv('DB_CONNECTION'))) {
+if (getenv('DB_CONNECTION') === 'sqlite' || !getenv('DB_CONNECTION')) {
     putenv("DB_DATABASE={$dbTarget}");
     $_ENV['DB_DATABASE'] = $dbTarget;
     $_SERVER['DB_DATABASE'] = $dbTarget;
