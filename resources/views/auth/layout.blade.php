@@ -137,6 +137,173 @@
         html[data-bs-theme="dark"] .text-dark, html[data-theme="dark"] .text-dark { color: #f8fafc !important; }
         html[data-bs-theme="dark"] .bg-white, html[data-theme="dark"] .bg-white { background-color: #131c2e !important; }
         html[data-bs-theme="dark"] .form-label, html[data-theme="dark"] .form-label { color: #cbd5e1; }
+
+        /* =========================================================
+           SWEETALERT2 LIGHT / DARK MODE FONT COLORS & THEME
+        ========================================================= */
+        .swal2-popup {
+            font-family: inherit;
+            border-radius: 16px !important;
+        }
+
+        /* SweetAlert Light Mode */
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-popup,
+        html[data-bs-theme="light"] .swal2-popup,
+        html[data-theme="light"] .swal2-popup {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-title,
+        html[data-bs-theme="light"] .swal2-title,
+        html[data-theme="light"] .swal2-title {
+            color: #111827 !important;
+            font-weight: 700 !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-html-container,
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-content,
+        html[data-bs-theme="light"] .swal2-html-container,
+        html[data-theme="light"] .swal2-html-container,
+        html[data-bs-theme="light"] .swal2-content,
+        html[data-theme="light"] .swal2-content {
+            color: #4b5563 !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-footer,
+        html[data-bs-theme="light"] .swal2-footer,
+        html[data-theme="light"] .swal2-footer {
+            color: #6b7280 !important;
+            border-top: 1px solid #e5e7eb !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-footer a,
+        html[data-bs-theme="light"] .swal2-footer a,
+        html[data-theme="light"] .swal2-footer a {
+            color: #16a34a !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-close,
+        html[data-bs-theme="light"] .swal2-close,
+        html[data-theme="light"] .swal2-close {
+            color: #6b7280 !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-close:hover,
+        html[data-bs-theme="light"] .swal2-close:hover,
+        html[data-theme="light"] .swal2-close:hover {
+            color: #111827 !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-input,
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-textarea,
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-select,
+        html[data-bs-theme="light"] .swal2-input,
+        html[data-theme="light"] .swal2-input,
+        html[data-theme="light"] .swal2-textarea,
+        html[data-theme="light"] .swal2-textarea,
+        html[data-theme="light"] .swal2-select,
+        html[data-theme="light"] .swal2-select {
+            color: #111827 !important;
+            background: #ffffff !important;
+            border-color: #d1d5db !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-toast,
+        html[data-bs-theme="light"] .swal2-toast,
+        html[data-theme="light"] .swal2-toast {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-toast .swal2-title,
+        html[data-bs-theme="light"] .swal2-toast .swal2-title,
+        html[data-theme="light"] .swal2-toast .swal2-title {
+            color: #111827 !important;
+        }
+        html:not([data-bs-theme="dark"]):not([data-theme="dark"]) .swal2-toast .swal2-html-container,
+        html[data-bs-theme="light"] .swal2-toast .swal2-html-container,
+        html[data-theme="light"] .swal2-toast .swal2-html-container {
+            color: #4b5563 !important;
+        }
+
+        /* SweetAlert Dark Mode */
+        html[data-bs-theme="dark"] .swal2-popup,
+        html[data-theme="dark"] .swal2-popup {
+            background: #131c2e !important;
+            color: #e2e8f0 !important;
+            border: 1px solid #223048 !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6) !important;
+        }
+        html[data-bs-theme="dark"] .swal2-title,
+        html[data-theme="dark"] .swal2-title {
+            color: #f8fafc !important;
+            font-weight: 700 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-html-container,
+        html[data-theme="dark"] .swal2-html-container,
+        html[data-bs-theme="dark"] .swal2-content,
+        html[data-theme="dark"] .swal2-content {
+            color: #cbd5e1 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-footer,
+        html[data-theme="dark"] .swal2-footer {
+            color: #94a3b8 !important;
+            border-top: 1px solid #223048 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-footer a,
+        html[data-theme="dark"] .swal2-footer a {
+            color: #4ade80 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-close,
+        html[data-theme="dark"] .swal2-close {
+            color: #94a3b8 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-close:hover,
+        html[data-theme="dark"] .swal2-close:hover {
+            color: #f8fafc !important;
+        }
+        html[data-bs-theme="dark"] .swal2-input,
+        html[data-theme="dark"] .swal2-input,
+        html[data-bs-theme="dark"] .swal2-textarea,
+        html[data-theme="dark"] .swal2-textarea,
+        html[data-bs-theme="dark"] .swal2-select,
+        html[data-theme="dark"] .swal2-select {
+            color: #f8fafc !important;
+            background: #0b1320 !important;
+            border-color: #223048 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-validation-message,
+        html[data-theme="dark"] .swal2-validation-message {
+            background-color: #2b1317 !important;
+            color: #fca5a5 !important;
+            border: 1px solid #7f1d1d !important;
+        }
+        html[data-bs-theme="dark"] .swal2-cancel,
+        html[data-theme="dark"] .swal2-cancel {
+            background-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+        html[data-bs-theme="dark"] .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+        html[data-theme="dark"] .swal2-icon.swal2-success [class^='swal2-success-circular-line'],
+        html[data-theme="dark"] .swal2-icon.swal2-success .swal2-success-fix,
+        html[data-theme="dark"] .swal2-icon.swal2-success .swal2-success-fix {
+            background-color: transparent !important;
+        }
+        html[data-bs-theme="dark"] .swal2-toast,
+        html[data-theme="dark"] .swal2-toast {
+            background: #131c2e !important;
+            color: #f8fafc !important;
+            border: 1px solid #223048 !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+        }
+        html[data-bs-theme="dark"] .swal2-toast .swal2-title,
+        html[data-theme="dark"] .swal2-toast .swal2-title {
+            color: #f8fafc !important;
+        }
+        html[data-bs-theme="dark"] .swal2-toast .swal2-html-container,
+        html[data-theme="dark"] .swal2-toast .swal2-html-container {
+            color: #cbd5e1 !important;
+        }
+        html[data-bs-theme="dark"] .swal2-toast .swal2-close,
+        html[data-theme="dark"] .swal2-toast .swal2-close {
+            color: #94a3b8 !important;
+        }
     </style>
 </head>
 

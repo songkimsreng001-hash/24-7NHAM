@@ -85,7 +85,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::post('/addresses/{id}/default', [AddressController::class, 'setDefault'])->name('addresses.default');
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy'])->name('addresses.destroy');
-    Route::post('/addresses/calculate-distance', [AddressController::class, 'calculateDistance'])->name('addresses.distance');
+    Route::match(['get', 'post'], '/addresses/calculate-distance', [AddressController::class, 'calculateDistance'])->name('addresses.distance');
+
+    // Route aliases for address.* (singular compatibility)
+    Route::match(['get', 'post'], '/address/calculate-distance', [AddressController::class, 'calculateDistance'])->name('address.distance');
+    Route::post('/address', [AddressController::class, 'store'])->name('address.store');
+    Route::get('/address', [AddressController::class, 'index'])->name('address.index');
 
     // Promo Codes Validation & Apply
     Route::post('/promo/apply', [PromoController::class, 'apply'])->name('promo.apply');

@@ -49,4 +49,32 @@ class ThemeModeTest extends TestCase
         $response->assertSee('theme-toggle-btn', false);
         $response->assertSee('nham_theme', false);
     }
+
+    public function test_sweetalert_font_colors_and_theme_adapt_to_light_and_dark_mode(): void
+    {
+        // 1. Frontend layout contains SweetAlert light and dark rules
+        $frontResp = $this->get('/');
+        $frontResp->assertOk();
+        $frontResp->assertSee('.swal2-title', false);
+        $frontResp->assertSee('html[data-bs-theme="dark"] .swal2-title', false);
+        $frontResp->assertSee('html[data-bs-theme="dark"] .swal2-html-container', false);
+        $frontResp->assertSee('html[data-bs-theme="dark"] .swal2-popup', false);
+        $frontResp->assertSee('color: #f8fafc', false);
+        $frontResp->assertSee('color: #111827', false);
+
+        // 2. Admin dashboard contains SweetAlert light and dark rules
+        $admin = User::factory()->create(['role' => 'admin']);
+        $adminResp = $this->actingAs($admin)->get(route('dashboard'));
+        $adminResp->assertOk();
+        $adminResp->assertSee('.swal2-title', false);
+        $adminResp->assertSee('html[data-bs-theme="dark"] .swal2-title', false);
+        $adminResp->assertSee('html[data-bs-theme="dark"] .swal2-html-container', false);
+
+        // 3. Auth pages contain SweetAlert light and dark rules
+        $authResp = $this->get(route('login'));
+        $authResp->assertOk();
+        $authResp->assertSee('.swal2-title', false);
+        $authResp->assertSee('html[data-bs-theme="dark"] .swal2-title', false);
+        $authResp->assertSee('html[data-bs-theme="dark"] .swal2-html-container', false);
+    }
 }

@@ -378,4 +378,44 @@ class ComprehensiveDeliveryPlatformTest extends TestCase
             'type' => 'dispute_update',
         ]);
     }
+
+    public function test_checkout_page_renders_successfully_with_cart_and_address_routes(): void
+    {
+        $response = $this->actingAs($this->customer)
+            ->withSession([
+                'cart' => [
+                    $this->product->id => [
+                        'id' => $this->product->id,
+                        'name' => $this->product->name,
+                        'price' => $this->product->price,
+                        'quantity' => 2,
+                        'image' => null,
+                    ]
+                ]
+            ])
+            ->get(route('cart.checkout'));
+
+        $response->assertOk();
+        $response->assertSee('newAddressForm', false);
+        $response->assertSee('addressModal', false);
+    }
+
+    public function test_calculate_distance_endpoints_support_get_and_post(): void
+    {
+        // Test GET on address.distance
+        $getResp = $this->actingAs($this->customer)->getJson(route('address.distance', [
+            'latitude' => 11.5564,
+            'longitude' => 104.9282,
+        ]));
+        $getResp->assertOk()
+            ->assertJsonStructure(['distance_km', 'eta_minutes', 'formatted']);
+
+        // Test POST on addresses.distance
+        $postResp = $this->actingAs($this->customer)->postJson(route('addresses.distance'), [
+            'latitude' => 11.5564,
+            'longitude' => 104.9282,
+        ]);
+        $postResp->assertOk()
+            ->assertJsonStructure(['distance_km', 'eta_minutes', 'formatted']);
+    }
 }
