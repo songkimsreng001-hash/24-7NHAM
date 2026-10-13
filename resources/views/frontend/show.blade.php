@@ -1,6 +1,57 @@
 @extends('layout.frontend')
 
 
+@push('styles')
+<style>
+    .product-title { color: #0f172a; }
+    .product-desc { color: #475569; }
+    .stepper-wrap {
+        display: flex; align-items: center; border: 1.5px solid #e2e8f0;
+        border-radius: 10px; overflow: hidden;
+    }
+    .stepper-btn {
+        width: 38px; height: 42px; border: none; background: #f8fafc;
+        font-size: 1.1rem; cursor: pointer; color: #475569; transition: background .18s;
+    }
+    .stepper-btn:hover { background: #f0fdf4; color: #16a34a; }
+    .stepper-input {
+        width: 50px; text-align: center; border: none; outline: none;
+        font-size: .9rem; font-weight: 600; color: #0f172a; background: #fff;
+    }
+    .back-products-link { color: #64748b; }
+    .back-products-link:hover { color: #16a34a; }
+
+    html[data-bs-theme="dark"] .product-title,
+    html[data-theme="dark"] .product-title {
+        color: #f8fafc !important;
+    }
+    html[data-bs-theme="dark"] .product-desc,
+    html[data-theme="dark"] .product-desc {
+        color: #cbd5e1 !important;
+    }
+    html[data-bs-theme="dark"] .stepper-wrap,
+    html[data-theme="dark"] .stepper-wrap {
+        border-color: #24344d;
+    }
+    html[data-bs-theme="dark"] .stepper-btn,
+    html[data-theme="dark"] .stepper-btn {
+        background: #131c2e; color: #cbd5e1;
+    }
+    html[data-bs-theme="dark"] .stepper-btn:hover,
+    html[data-theme="dark"] .stepper-btn:hover {
+        background: #1e293b; color: #4ade80;
+    }
+    html[data-bs-theme="dark"] .stepper-input,
+    html[data-theme="dark"] .stepper-input {
+        background: #0b1320; color: #f8fafc;
+    }
+    html[data-bs-theme="dark"] .back-products-link,
+    html[data-theme="dark"] .back-products-link {
+        color: #94a3b8 !important;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="container" style="padding-top:40px; padding-bottom:64px;">
 
@@ -52,7 +103,7 @@
             @endif
 
             <div style="font-size:.8rem; color:#94a3b8; margin-bottom:6px;">SKU: #{{ $product->id }}</div>
-            <h1 style="font-size:2rem; font-weight:800; color:#0f172a; margin-bottom:12px;">
+            <h1 class="product-title" style="font-size:2rem; font-weight:800; margin-bottom:12px;">
                 {{ $product->name }}
             </h1>
 
@@ -60,22 +111,17 @@
                 ${{ number_format($product->price, 2) }}
             </div>
 
-            <p style="color:#475569; font-size:.92rem; line-height:1.7; margin-bottom:28px;">
+            <p class="product-desc" style="font-size:.92rem; line-height:1.7; margin-bottom:28px;">
                 {{ $product->description ?: 'No description available.' }}
             </p>
 
             {{-- FIX: Add to cart now uses a proper link with quantity passed via URL / session
                  The original was a dead <button> with no form or route --}}
             <div class="d-flex align-items-center gap-3 mb-4">
-                <div style="display:flex; align-items:center; border:1.5px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-                    <button onclick="stepQty(-1)" type="button"
-                            style="width:38px; height:42px; border:none; background:#f8fafc; font-size:1.1rem; cursor:pointer; color:#475569; transition:background .18s;"
-                            onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='#f8fafc'">−</button>
-                    <input type="number" id="qtyInput" value="1" min="1" max="99"
-                           style="width:50px; text-align:center; border:none; outline:none; font-size:.9rem; font-weight:600; color:#0f172a;">
-                    <button onclick="stepQty(1)" type="button"
-                            style="width:38px; height:42px; border:none; background:#f8fafc; font-size:1.1rem; cursor:pointer; color:#475569; transition:background .18s;"
-                            onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='#f8fafc'">+</button>
+                <div class="stepper-wrap">
+                    <button onclick="stepQty(-1)" type="button" class="stepper-btn">−</button>
+                    <input type="number" id="qtyInput" value="1" min="1" max="99" class="stepper-input">
+                    <button onclick="stepQty(1)" type="button" class="stepper-btn">+</button>
                 </div>
                 <a id="addToCartBtn"
                    href="{{ route('add.to.cart', $product->id) }}"
@@ -85,8 +131,8 @@
                 </a>
             </div>
 
-            <a href="{{ url('/list') }}"
-               style="color:#64748b; font-size:.83rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+            <a href="{{ url('/list') }}" class="back-products-link"
+               style="font-size:.83rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
                 <i class="fas fa-arrow-left"></i> Back to Products
             </a>
         </div>

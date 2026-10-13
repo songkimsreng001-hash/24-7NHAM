@@ -4,6 +4,12 @@
 @push('styles')
 <style>
     .cart-wrap { padding: 40px 0 80px; }
+    .cart-title { font-size: 1.65rem; font-weight: 700; color: #0f172a; }
+    .cart-subtitle { font-size: .85rem; color: #64748b; }
+    .cart-card {
+        background: #fff; border-radius: 20px; border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04); overflow: hidden;
+    }
     .cart-table { width: 100%; border-collapse: collapse; }
     .cart-table th {
         font-size: .72rem; font-weight: 600; color: #94a3b8;
@@ -17,6 +23,7 @@
     }
     .cart-table tr:last-child td { border-bottom: none; }
     .cart-table tr:hover td { background: #fafafa; }
+    .cart-subtotal-cell { font-weight: 700; color: #0f172a; }
 
     .cart-product-img {
         width: 72px; height: 72px; border-radius: 12px;
@@ -27,7 +34,7 @@
         width: 68px; text-align: center;
         border: 1.5px solid #e2e8f0; border-radius: 9px;
         padding: 7px 8px; font-size: .88rem; font-weight: 600;
-        color: #0f172a; outline: none;
+        color: #0f172a; outline: none; background: #fff;
         transition: border-color .18s;
     }
     .qty-input:focus { border-color: #16a34a; }
@@ -89,14 +96,105 @@
     .empty-cart i { font-size: 3.5rem; margin-bottom: 18px; opacity: .35; }
     .empty-cart h4 { font-weight: 700; color: #475569; margin-bottom: 8px; }
     .empty-cart p { font-size: .87rem; margin-bottom: 22px; }
+
+    /* Cart Dark Mode */
+    html[data-bs-theme="dark"] .cart-title,
+    html[data-theme="dark"] .cart-title {
+        color: #f8fafc !important;
+    }
+    html[data-bs-theme="dark"] .cart-subtitle,
+    html[data-theme="dark"] .cart-subtitle {
+        color: #94a3b8 !important;
+    }
+    html[data-bs-theme="dark"] .cart-card,
+    html[data-theme="dark"] .cart-card {
+        background: #131c2e;
+        border-color: #24344d;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    html[data-bs-theme="dark"] .cart-table th,
+    html[data-theme="dark"] .cart-table th {
+        color: #94a3b8;
+        border-color: #24344d;
+    }
+    html[data-bs-theme="dark"] .cart-table td,
+    html[data-theme="dark"] .cart-table td {
+        color: #e2e8f0;
+        border-color: #1e293b;
+    }
+    html[data-bs-theme="dark"] .cart-table tr:hover td,
+    html[data-theme="dark"] .cart-table tr:hover td {
+        background: #1a2538;
+    }
+    html[data-bs-theme="dark"] .cart-product-img,
+    html[data-theme="dark"] .cart-product-img {
+        border-color: #24344d;
+    }
+    html[data-bs-theme="dark"] .cart-product-name,
+    html[data-theme="dark"] .cart-product-name,
+    html[data-bs-theme="dark"] .cart-subtotal-cell,
+    html[data-theme="dark"] .cart-subtotal-cell {
+        color: #f8fafc !important;
+    }
+    html[data-bs-theme="dark"] .qty-input,
+    html[data-theme="dark"] .qty-input {
+        background: #0b1320;
+        border-color: #24344d;
+        color: #f8fafc;
+    }
+    html[data-bs-theme="dark"] .btn-remove,
+    html[data-theme="dark"] .btn-remove {
+        background: #1f1d24;
+        border-color: #4a2828;
+    }
+    html[data-bs-theme="dark"] .summary-panel,
+    html[data-theme="dark"] .summary-panel {
+        background: #131c2e;
+        border-color: #24344d;
+        color: #e2e8f0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    html[data-bs-theme="dark"] .summary-title,
+    html[data-theme="dark"] .summary-title,
+    html[data-bs-theme="dark"] .summary-total,
+    html[data-theme="dark"] .summary-total {
+        color: #f8fafc !important;
+        border-color: #24344d;
+    }
+    html[data-bs-theme="dark"] .summary-row,
+    html[data-theme="dark"] .summary-row {
+        color: #94a3b8;
+        border-color: #1e293b;
+    }
+    html[data-bs-theme="dark"] .btn-continue,
+    html[data-theme="dark"] .btn-continue {
+        background: #1e293b;
+        color: #cbd5e1;
+        border-color: #334155;
+    }
+    html[data-bs-theme="dark"] .btn-continue:hover,
+    html[data-theme="dark"] .btn-continue:hover {
+        border-color: #16a34a;
+        color: #4ade80;
+    }
+    html[data-bs-theme="dark"] .empty-cart,
+    html[data-theme="dark"] .empty-cart {
+        background: #131c2e;
+        border-color: #24344d;
+        color: #94a3b8;
+    }
+    html[data-bs-theme="dark"] .empty-cart h4,
+    html[data-theme="dark"] .empty-cart h4 {
+        color: #f8fafc;
+    }
 </style>
 @endpush
 
 @section('content')
 <div class="container cart-wrap">
     <div class="mb-4">
-        <h2 style="font-size:1.65rem; font-weight:700; color:#0f172a;">Shopping Cart</h2>
-        <p style="font-size:.85rem; color:#64748b;">
+        <h2 class="cart-title">Shopping Cart</h2>
+        <p class="cart-subtitle">
             @php $cartItems = session('cart', []); $itemCount = count($cartItems); @endphp
             {{ $itemCount }} {{ Str::plural('item', $itemCount) }} in your cart
         </p>
@@ -117,7 +215,7 @@
 
             {{-- Cart table --}}
             <div class="col-lg-8">
-                <div style="background:#fff; border-radius:20px; border:1px solid #f1f5f9; box-shadow:0 2px 8px rgba(0,0,0,.04); overflow:hidden;">
+                <div class="cart-card">
                     <div style="overflow-x:auto;">
                         @php $total = 0; @endphp
                         <table class="cart-table">
@@ -139,7 +237,7 @@
                                                 {{-- FIX: was img/{{ image }} (missing asset()), broke on some servers --}}
                                                 @php
                                                     $cartImg = $details['image_url'] ?? (
-                                                        !empty($details['image'])
+                                                         !empty($details['image'])
                                                             ? (str_starts_with($details['image'], 'http') ? $details['image'] : asset('img/' . $details['image']))
                                                             : asset('img/logo.png')
                                                     );
@@ -155,7 +253,7 @@
                                                    min="1" max="99"
                                                    class="qty-input update-cart">
                                         </td>
-                                        <td style="font-weight:700; color:#0f172a;">
+                                        <td class="cart-subtotal-cell">
                                             ${{ number_format($subtotal, 2) }}
                                         </td>
                                         <td>
