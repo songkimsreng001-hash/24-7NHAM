@@ -139,6 +139,164 @@
         .logout-form { margin:0; }
         .logout-button { border:0;background:transparent;text-align:left;cursor:pointer;color:rgba(255,255,255,.7); }
 
+        /* =========================================================
+           SIDEBAR GROUP ACCORDION / LISTDOWN STYLING
+        ========================================================= */
+        .nav-group {
+            margin-bottom: 4px;
+        }
+        .nav-group-toggle {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 44px;
+            padding: 10px 13px;
+            margin: 2px 0;
+            border-radius: 12px;
+            border: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, .78);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: all .2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .nav-group-toggle:hover {
+            background: rgba(255, 255, 255, .15);
+            color: #ffffff;
+        }
+        .nav-group-toggle.has-active-child {
+            color: #ffffff;
+            background: rgba(255, 255, 255, .18);
+            font-weight: 800;
+        }
+        .nav-group-toggle.has-active-child::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 4px;
+            border-radius: 0 4px 4px 0;
+            background: #1fd361;
+        }
+        .nav-group-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .nav-group-chevron {
+            width: 16px;
+            height: 16px;
+            display: grid;
+            place-items: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, .65);
+            transition: transform .22s ease, color .22s ease;
+            flex: none;
+            margin-left: auto;
+        }
+        .nav-group-toggle[aria-expanded="true"] {
+            color: #ffffff;
+            background: rgba(255, 255, 255, .12);
+        }
+        .nav-group-toggle[aria-expanded="true"].has-active-child {
+            background: rgba(255, 255, 255, .22);
+        }
+        .nav-group-toggle[aria-expanded="true"] .nav-group-chevron {
+            transform: rotate(180deg) !important;
+            color: #ffffff !important;
+        }
+        .nav-group-collapse {
+            display: none !important;
+            visibility: visible !important;
+            overflow: hidden;
+        }
+        .nav-group-collapse.show {
+            display: block !important;
+            visibility: visible !important;
+            animation: navSlideDown .18s cubic-bezier(0, 0, 0.2, 1);
+        }
+        @keyframes navSlideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .nav-group-items {
+            padding: 3px 0 6px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            position: relative;
+        }
+        .nav-group-items::before {
+            content: "";
+            position: absolute;
+            left: 21px;
+            top: 4px;
+            bottom: 8px;
+            width: 1.5px;
+            background: rgba(255, 255, 255, .18);
+        }
+        .nav-sub-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 38px;
+            padding: 8px 12px 8px 22px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, .75);
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all .16s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .nav-sub-item:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, .14);
+            transform: translateX(3px);
+        }
+        .nav-sub-item.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, .24);
+            font-weight: 700;
+        }
+        .nav-sub-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .4);
+            flex: none;
+            transition: all .16s ease;
+        }
+        .nav-sub-item:hover .nav-sub-dot,
+        .nav-sub-item.active .nav-sub-dot {
+            background: #1fd361;
+            transform: scale(1.3);
+            box-shadow: 0 0 6px rgba(31, 211, 97, .8);
+        }
+        .nav-sub-text,
+        .nav-sub-item .nav-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .sidebar-promo {
             margin:12px 10px 15px;
             padding:16px;
@@ -483,6 +641,14 @@
         body.sidebar-collapsed .admin-theme-label,
         html.sidebar-collapsed .admin-theme-badge,
         body.sidebar-collapsed .admin-theme-badge,
+        html.sidebar-collapsed .nav-group-title,
+        body.sidebar-collapsed .nav-group-title,
+        html.sidebar-collapsed .nav-group-chevron,
+        body.sidebar-collapsed .nav-group-chevron,
+        html.sidebar-collapsed .nav-group-collapse,
+        body.sidebar-collapsed .nav-group-collapse,
+        html.sidebar-collapsed .nav-sub-text,
+        body.sidebar-collapsed .nav-sub-text,
         html.sidebar-collapsed .sidebar-promo,
         body.sidebar-collapsed .sidebar-promo,
         html.sidebar-collapsed .sidebar-user-main,
@@ -516,7 +682,9 @@
         }
 
         html.sidebar-collapsed .nav-item-link,
-        body.sidebar-collapsed .nav-item-link {
+        body.sidebar-collapsed .nav-item-link,
+        html.sidebar-collapsed .nav-group-toggle,
+        body.sidebar-collapsed .nav-group-toggle {
             justify-content: center;
             padding: 10px 0;
             gap: 0;
@@ -524,13 +692,17 @@
         }
 
         html.sidebar-collapsed .nav-icon,
-        body.sidebar-collapsed .nav-icon {
+        body.sidebar-collapsed .nav-icon,
+        html.sidebar-collapsed .nav-group-toggle .nav-icon,
+        body.sidebar-collapsed .nav-group-toggle .nav-icon {
             margin: 0 auto;
             width: 24px;
             height: 24px;
         }
 
         html.sidebar-collapsed .nav-icon svg,
+        body.sidebar-collapsed .nav-icon svg,
+        html.sidebar-collapsed .nav-icon i,
         body.sidebar-collapsed .nav-icon i {
             width: 19px;
             height: 19px;
@@ -538,7 +710,9 @@
         }
 
         html.sidebar-collapsed .nav-item-link.active::before,
-        body.sidebar-collapsed .nav-item-link.active::before {
+        body.sidebar-collapsed .nav-item-link.active::before,
+        html.sidebar-collapsed .nav-group-toggle.has-active-child::before,
+        body.sidebar-collapsed .nav-group-toggle.has-active-child::before {
             left: 0;
             top: 6px;
             bottom: 6px;
@@ -935,6 +1109,48 @@
             border-color: rgba(255,255,255,.15) !important;
             color: #ffffff !important;
         }
+        html[data-bs-theme="dark"] .nav-group-toggle:hover,
+        html[data-theme="dark"] .nav-group-toggle:hover {
+            background: rgba(255, 255, 255, .1);
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .nav-group-toggle[aria-expanded="true"],
+        html[data-theme="dark"] .nav-group-toggle[aria-expanded="true"] {
+            background: rgba(255, 255, 255, .08);
+            color: #ffffff;
+        }
+        html[data-bs-theme="dark"] .nav-group-toggle[aria-expanded="true"] .nav-group-chevron,
+        html[data-theme="dark"] .nav-group-toggle[aria-expanded="true"] .nav-group-chevron {
+            color: #4ade80 !important;
+        }
+        html[data-bs-theme="dark"] .nav-group-toggle.has-active-child,
+        html[data-theme="dark"] .nav-group-toggle.has-active-child {
+            background: rgba(22, 163, 74, .25);
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .nav-group-toggle.has-active-child::before,
+        html[data-theme="dark"] .nav-group-toggle.has-active-child::before {
+            background: #4ade80;
+        }
+        html[data-bs-theme="dark"] .nav-group-items::before,
+        html[data-theme="dark"] .nav-group-items::before {
+            background: rgba(74, 222, 128, .2);
+        }
+        html[data-bs-theme="dark"] .nav-sub-item:hover,
+        html[data-theme="dark"] .nav-sub-item:hover {
+            background: rgba(255, 255, 255, .08);
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .nav-sub-item.active,
+        html[data-theme="dark"] .nav-sub-item.active {
+            background: rgba(22, 163, 74, .3);
+            color: #4ade80;
+        }
+        html[data-bs-theme="dark"] .nav-sub-item.active .nav-sub-dot,
+        html[data-theme="dark"] .nav-sub-item.active .nav-sub-dot {
+            background: #4ade80;
+            box-shadow: 0 0 6px rgba(74, 222, 128, .8);
+        }
         html[data-bs-theme="dark"] .card,
         html[data-theme="dark"] .card {
             background-color: #14201a !important;
@@ -1023,12 +1239,12 @@
     <div id="sidebar-overlay"></div>
 
     <aside id="sidebar" aria-label="Main navigation">
-        <div class="brand">
+        <a href="{{ route('dashboard') }}" class="brand text-decoration-none" title="24/7 NHAM">
             <div class="brand-mark p-1" style="background: rgba(255,255,255,.95); overflow: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
                 <img src="{{ asset('img/logo.png') }}" alt="24/7 NHAM" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
             <div class="brand-name">24/7 <span>NHAM</span></div>
-        </div>
+        </a>
 
         <div class="sidebar-search" style="padding:14px 14px 2px;">
             <div style="position:relative;">
@@ -1039,86 +1255,193 @@
             </div>
         </div>
         <div class="sidebar-scroll" id="sidebarScroll">
-            <div class="sidebar-label">Menu</div>
+            <div class="sidebar-label">Navigation</div>
             <nav class="sidebar-nav">
-                <a href="{{ route('dashboard') }}" class="nav-item-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="Dashboard">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-                <a href="{{ route('product.index') }}" class="nav-item-link {{ request()->routeIs('product.*') ? 'active' : '' }}" title="Products">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m5 7 7-3 7 3-7 3z"/><path d="M5 7v10l7 3 7-3V7M12 10v10"/></svg></span>
-                    <span class="nav-text">Products</span>
-                </a>
-                <a href="{{ route('category.list') }}" class="nav-item-link {{ request()->routeIs('category.*') ? 'active' : '' }}" title="Categories">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 6h7v5H4zM13 6h7v5h-7zM4 13h7v5H4zM13 13h7v5h-7z"/></svg></span>
-                    <span class="nav-text">Categories</span>
-                </a>
-                <a href="{{ route('admin.order') }}" class="nav-item-link {{ request()->routeIs('admin.order*') ? 'active' : '' }}" title="All Orders">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>
-                    <span class="nav-text">All Orders</span>
-                    @php $sidebarOrderCount = \App\Models\Order::whereIn('status',[1,2])->count(); @endphp
-                    @if($sidebarOrderCount)
-                        <span class="nav-badge">{{ $sidebarOrderCount > 99 ? '99+' : $sidebarOrderCount }}</span>
-                    @endif
-                </a>
-                <a href="{{ route('admin.orders.active') }}" class="nav-item-link {{ request()->routeIs('admin.orders.active') ? 'active' : '' }}" title="Active Deliveries">
-                    <span class="nav-icon"><i class="bi bi-bicycle"></i></span>
-                    <span class="nav-text">Active Deliveries</span>
-                </a>
-                <a href="{{ route('admin.users') }}" class="nav-item-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}" title="Users & Couriers">
-                    <span class="nav-icon"><i class="bi bi-people"></i></span>
-                    <span class="nav-text">Users & Couriers</span>
-                </a>
-                <a href="{{ route('admin.broadcast') }}" class="nav-item-link {{ request()->routeIs('admin.broadcast*') ? 'active' : '' }}" title="Broadcast Alerts">
-                    <span class="nav-icon"><i class="bi bi-megaphone"></i></span>
-                    <span class="nav-text">Broadcast Alerts</span>
-                </a>
-                <a href="{{ route('admin.promos') }}" class="nav-item-link {{ request()->routeIs('admin.promos*') ? 'active' : '' }}" title="Promo Codes">
-                    <span class="nav-icon"><i class="bi bi-tags"></i></span>
-                    <span class="nav-text">Promo Codes</span>
-                </a>
-                <a href="{{ route('admin.disputes') }}" class="nav-item-link {{ request()->routeIs('admin.disputes*') ? 'active' : '' }}" title="Disputes Queue">
-                    <span class="nav-icon"><i class="bi bi-shield-exclamation"></i></span>
-                    <span class="nav-text">Disputes Queue</span>
-                </a>
-                <a href="{{ route('admin.analytics') }}" class="nav-item-link {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}" title="Analytics & KPIs">
-                    <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
-                    <span class="nav-text">Analytics & KPIs</span>
-                </a>
-                <a href="{{ route('admin.audit') }}" class="nav-item-link {{ request()->routeIs('admin.audit*') ? 'active' : '' }}" title="Audit Trail">
-                    <span class="nav-icon"><i class="bi bi-journal-text"></i></span>
-                    <span class="nav-text">Audit Trail</span>
-                </a>
+                {{-- Group: Dashboard --}}
+                @php
+                    $isDashboardActive = request()->routeIs('dashboard') || request()->routeIs('admin.analytics*');
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isDashboardActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-dashboard"
+                            aria-expanded="{{ $isDashboardActive ? 'true' : 'false' }}" aria-controls="group-dashboard" title="Dashboard">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span>
+                        <span class="nav-group-title">Dashboard</span>
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
+                    </button>
+                    <div class="collapse nav-group-collapse {{ $isDashboardActive ? 'show' : '' }}" id="group-dashboard" data-initially-open="{{ $isDashboardActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('dashboard') }}" class="nav-sub-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="Dashboard">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                            <a href="{{ route('admin.analytics') }}" class="nav-sub-item {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}" title="Analytics & KPIs">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Analytics & KPIs</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Group: Catalog & Menu --}}
+                @php
+                    $isCatalogActive = request()->routeIs('product.*') || request()->routeIs('category.*');
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isCatalogActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-catalog"
+                            aria-expanded="{{ $isCatalogActive ? 'true' : 'false' }}" aria-controls="group-catalog" title="Catalog & Menu">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m5 7 7-3 7 3-7 3z"/><path d="M5 7v10l7 3 7-3V7M12 10v10"/></svg></span>
+                        <span class="nav-group-title">Catalog & Menu</span>
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
+                    </button>
+                    <div class="collapse nav-group-collapse {{ $isCatalogActive ? 'show' : '' }}" id="group-catalog" data-initially-open="{{ $isCatalogActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('product.index') }}" class="nav-sub-item {{ request()->routeIs('product.*') ? 'active' : '' }}" title="Products">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Products</span>
+                            </a>
+                            <a href="{{ route('category.list') }}" class="nav-sub-item {{ request()->routeIs('category.*') ? 'active' : '' }}" title="Categories">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Categories</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Group: Orders & Deliveries --}}
+                @php
+                    $isOrdersActive = request()->routeIs('admin.order*') || request()->routeIs('admin.orders.active*');
+                    $sidebarOrderCount = \App\Models\Order::whereIn('status',[1,2])->count();
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isOrdersActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-orders"
+                            aria-expanded="{{ $isOrdersActive ? 'true' : 'false' }}" aria-controls="group-orders" title="Orders & Deliveries">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>
+                        <span class="nav-group-title">Orders & Delivery</span>
+                        @if($sidebarOrderCount)
+                            <span class="nav-badge me-1">{{ $sidebarOrderCount > 99 ? '99+' : $sidebarOrderCount }}</span>
+                        @endif
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
+                    </button>
+                    <div class="collapse nav-group-collapse {{ $isOrdersActive ? 'show' : '' }}" id="group-orders" data-initially-open="{{ $isOrdersActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('admin.order') }}" class="nav-sub-item {{ request()->routeIs('admin.order*') ? 'active' : '' }}" title="All Orders">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">All Orders</span>
+                                @if($sidebarOrderCount)
+                                    <span class="nav-badge ms-auto">{{ $sidebarOrderCount > 99 ? '99+' : $sidebarOrderCount }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('admin.orders.active') }}" class="nav-sub-item {{ request()->routeIs('admin.orders.active') ? 'active' : '' }}" title="Active Deliveries">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Active Deliveries</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Group: Marketing & Promos --}}
+                @php
+                    $isMarketingActive = request()->routeIs('admin.promos*') || request()->routeIs('admin.broadcast*');
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isMarketingActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-marketing"
+                            aria-expanded="{{ $isMarketingActive ? 'true' : 'false' }}" aria-controls="group-marketing" title="Marketing & Promos">
+                        <span class="nav-icon"><i class="bi bi-megaphone"></i></span>
+                        <span class="nav-group-title">Marketing & Promos</span>
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
+                    </button>
+                    <div class="collapse nav-group-collapse {{ $isMarketingActive ? 'show' : '' }}" id="group-marketing" data-initially-open="{{ $isMarketingActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('admin.promos') }}" class="nav-sub-item {{ request()->routeIs('admin.promos*') ? 'active' : '' }}" title="Promo Codes">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Promo Codes</span>
+                            </a>
+                            <a href="{{ route('admin.broadcast') }}" class="nav-sub-item {{ request()->routeIs('admin.broadcast*') ? 'active' : '' }}" title="Broadcast Alerts">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Broadcast Alerts</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
-            <div class="sidebar-label">General</div>
-            <nav>
-                <a href="{{ route('profile.edit', auth()->id()) }}" class="nav-item-link {{ request()->routeIs('profile.*') ? 'active' : '' }}" title="Profile">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.4 3.2-5 7-5s6.2 1.6 7 5"/></svg></span>
-                    <span class="nav-text">Profile</span>
-                </a>
-                <a href="{{ url('/contact') }}" class="nav-item-link" title="Help & Support">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3z"/><path d="M8 9h8M8 13h5"/></svg></span>
-                    <span class="nav-text">Help & Support</span>
-                </a>
-
-                <!-- Theme Mode Toggle at Sidebar -->
-                <button type="button" class="nav-item-link logout-button admin-theme-toggle-btn w-100" id="sidebarThemeToggle" title="Toggle Light / Dark Mode">
-                    <span class="nav-icon">
-                        <i class="bi bi-moon-stars-fill text-warning theme-icon-dark"></i>
-                        <i class="bi bi-sun-fill text-warning theme-icon-light"></i>
-                    </span>
-                    <span class="nav-text admin-theme-label">Dark Mode</span>
-                    <span class="nav-badge admin-theme-badge ms-auto" style="font-size: 9px; padding: 2px 7px;">Light</span>
-                </button>
-
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                    @csrf
-                    <button type="submit" class="nav-item-link logout-button w-100" title="Log Out">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M10 5H5v14h5M13 8l4 4-4 4M17 12H9"/></svg></span>
-                        <span class="nav-text">Log Out</span>
+            <div class="sidebar-label">System & Account</div>
+            <nav class="sidebar-nav">
+                {{-- Group: Administration --}}
+                @php
+                    $isAdminActive = request()->routeIs('admin.users*') || request()->routeIs('admin.disputes*') || request()->routeIs('admin.audit*');
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isAdminActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-admin"
+                            aria-expanded="{{ $isAdminActive ? 'true' : 'false' }}" aria-controls="group-admin" title="Administration">
+                        <span class="nav-icon"><i class="bi bi-shield-lock"></i></span>
+                        <span class="nav-group-title">Administration</span>
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
-                </form>
+                    <div class="collapse nav-group-collapse {{ $isAdminActive ? 'show' : '' }}" id="group-admin" data-initially-open="{{ $isAdminActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('admin.users') }}" class="nav-sub-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}" title="Users & Couriers">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Users & Couriers</span>
+                            </a>
+                            <a href="{{ route('admin.disputes') }}" class="nav-sub-item {{ request()->routeIs('admin.disputes*') ? 'active' : '' }}" title="Disputes Queue">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Disputes Queue</span>
+                            </a>
+                            <a href="{{ route('admin.audit') }}" class="nav-sub-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}" title="Audit Trail">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Audit Trail</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Group: Account & Settings --}}
+                @php
+                    $isAccountActive = request()->routeIs('profile.*');
+                @endphp
+                <div class="nav-group">
+                    <button type="button" class="nav-group-toggle {{ $isAccountActive ? 'has-active-child' : '' }}"
+                            data-bs-target="#group-account"
+                            aria-expanded="{{ $isAccountActive ? 'true' : 'false' }}" aria-controls="group-account" title="Account & Settings">
+                        <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.4 3.2-5 7-5s6.2 1.6 7 5"/></svg></span>
+                        <span class="nav-group-title">Account & Settings</span>
+                        <i class="bi bi-chevron-down nav-group-chevron"></i>
+                    </button>
+                    <div class="collapse nav-group-collapse {{ $isAccountActive ? 'show' : '' }}" id="group-account" data-initially-open="{{ $isAccountActive ? 'true' : 'false' }}">
+                        <div class="nav-group-items">
+                            <a href="{{ route('profile.edit', auth()->id()) }}" class="nav-sub-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" title="Profile">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Profile</span>
+                            </a>
+                            <a href="{{ url('/contact') }}" class="nav-sub-item" title="Help & Support">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text">Help & Support</span>
+                            </a>
+
+                            <!-- Theme Mode Toggle at Sidebar -->
+                            <button type="button" class="nav-sub-item logout-button admin-theme-toggle-btn w-100 border-0 bg-transparent text-start" id="sidebarThemeToggle" title="Toggle Light / Dark Mode">
+                                <span class="nav-sub-dot"></span>
+                                <span class="nav-text admin-theme-label">Dark Mode</span>
+                                <span class="nav-badge admin-theme-badge ms-auto" style="font-size: 9px; padding: 2px 7px;">Light</span>
+                            </button>
+
+                            <!-- Log Out Form -->
+                            <form action="{{ route('logout') }}" method="POST" class="logout-form m-0">
+                                @csrf
+                                <button type="submit" class="nav-sub-item logout-button w-100 border-0 bg-transparent text-start" title="Log Out">
+                                    <span class="nav-sub-dot"></span>
+                                    <span class="nav-text">Log Out</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             <div class="sidebar-promo">
@@ -1251,8 +1574,37 @@
                 setSidebarCollapsed(true, true);
             });
 
-            // On mobile devices, clicking a navigation link closes expanded sidebar back to icons
-            document.querySelectorAll('#sidebarScroll .nav-item-link').forEach(link => {
+            // =========================================================
+            // SIDEBAR LISTDOWN / ACCORDION CONTROLLER (PURE VANILLA JS)
+            // =========================================================
+            document.querySelectorAll('#sidebarScroll .nav-group-toggle').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // If sidebar was in collapsed (icons-only) mode, expand it so the user can see sub-items
+                    if (isSidebarCollapsed()) {
+                        setSidebarCollapsed(false, true);
+                    }
+
+                    const targetSelector = this.getAttribute('data-bs-target') || this.getAttribute('data-target');
+                    const collapseEl = targetSelector ? document.querySelector(targetSelector) : this.nextElementSibling;
+                    if (!collapseEl) return;
+
+                    const isOpen = collapseEl.classList.contains('show');
+
+                    if (isOpen) {
+                        collapseEl.classList.remove('show');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        collapseEl.classList.add('show');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+
+            // On mobile devices, clicking an actual navigation link closes expanded sidebar back to icons
+            document.querySelectorAll('#sidebarScroll .nav-sub-item, #sidebarScroll .nav-item-link').forEach(link => {
                 link.addEventListener('click', function () {
                     if (window.innerWidth < 768 && !isSidebarCollapsed()) {
                         setSidebarCollapsed(true, true);
@@ -1274,7 +1626,7 @@
             }
 
             // =========================================================
-            // SIDEBAR SEARCH: Real-time filtering across all menu sections
+            // SIDEBAR SEARCH: Real-time filtering across groups and listdown items
             // =========================================================
             const sidebarSearch = document.getElementById('sidebarSearch');
             if (sidebarSearch) {
@@ -1282,20 +1634,47 @@
                     const q = this.value.trim().toLowerCase();
                     let anyVisible = false;
 
-                    document.querySelectorAll('#sidebarScroll .nav-item-link').forEach(item => {
-                        const text = item.innerText.toLowerCase();
-                        const match = !q || text.includes(q);
-                        item.style.display = match ? 'flex' : 'none';
-                        if (match) anyVisible = true;
+                    document.querySelectorAll('#sidebarScroll .nav-group').forEach(group => {
+                        const toggle = group.querySelector('.nav-group-toggle');
+                        const collapseEl = group.querySelector('.nav-group-collapse');
+                        const groupTitle = toggle?.querySelector('.nav-group-title')?.textContent.toLowerCase() || '';
+                        const items = group.querySelectorAll('.nav-sub-item');
+                        let groupMatches = false;
+
+                        items.forEach(item => {
+                            const text = item.textContent.toLowerCase();
+                            const matches = !q || text.includes(q) || groupTitle.includes(q);
+                            item.style.display = matches ? 'flex' : 'none';
+                            if (matches) groupMatches = true;
+                        });
+
+                        if (!q) {
+                            group.style.display = 'block';
+                            if (collapseEl) {
+                                const initiallyOpen = collapseEl.getAttribute('data-initially-open') === 'true';
+                                if (initiallyOpen) {
+                                    collapseEl.classList.add('show');
+                                    toggle?.setAttribute('aria-expanded', 'true');
+                                } else {
+                                    collapseEl.classList.remove('show');
+                                    toggle?.setAttribute('aria-expanded', 'false');
+                                }
+                            }
+                        } else {
+                            if (groupMatches) {
+                                group.style.display = 'block';
+                                collapseEl?.classList.add('show');
+                                toggle?.setAttribute('aria-expanded', 'true');
+                                anyVisible = true;
+                            } else {
+                                group.style.display = 'none';
+                            }
+                        }
                     });
 
-                    // Hide headers if their section has no visible items
+                    // Hide headers and promo during active search
                     document.querySelectorAll('#sidebarScroll .sidebar-label').forEach(label => {
-                        const nextNav = label.nextElementSibling;
-                        if (nextNav && nextNav.tagName === 'NAV') {
-                            const hasVisible = Array.from(nextNav.querySelectorAll('.nav-item-link')).some(link => link.style.display !== 'none');
-                            label.style.display = hasVisible ? 'block' : 'none';
-                        }
+                        label.style.display = q ? 'none' : 'block';
                     });
 
                     const promo = document.querySelector('.sidebar-promo');

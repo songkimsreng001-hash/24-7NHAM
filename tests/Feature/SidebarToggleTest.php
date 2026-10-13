@@ -103,4 +103,35 @@ class SidebarToggleTest extends TestCase
         $response->assertSee('isSidebarCollapsed', false);
         $response->assertSee("localStorage.setItem('nham_sidebar_collapsed'", false);
     }
+
+    public function test_admin_sidebar_group_listdown_structure_and_active_expansion(): void
+    {
+        $admin = User::factory()->create([
+            'name' => 'Admin Tester',
+            'email' => 'admin_sidebar_groups@example.com',
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('dashboard'));
+        $response->assertOk();
+
+        // Check group toggles and listdown containers exist
+        $response->assertSee('data-bs-target="#group-dashboard"', false);
+        $response->assertSee('id="group-dashboard"', false);
+        $response->assertSee('data-bs-target="#group-catalog"', false);
+        $response->assertSee('id="group-catalog"', false);
+        $response->assertSee('data-bs-target="#group-orders"', false);
+        $response->assertSee('id="group-orders"', false);
+        $response->assertSee('data-bs-target="#group-marketing"', false);
+        $response->assertSee('id="group-marketing"', false);
+        $response->assertSee('data-bs-target="#group-admin"', false);
+        $response->assertSee('id="group-admin"', false);
+        $response->assertSee('data-bs-target="#group-account"', false);
+        $response->assertSee('id="group-account"', false);
+
+        // On /dashboard, the dashboard group should be expanded with 'show'
+        $response->assertSee('id="group-dashboard" data-initially-open="true"', false);
+        $response->assertSee('navSlideDown', false);
+        $response->assertSee('SIDEBAR LISTDOWN / ACCORDION CONTROLLER', false);
+    }
 }
