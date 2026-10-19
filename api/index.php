@@ -3,18 +3,24 @@
 // Forward Vercel requests to normal Laravel public/index.php
 // Ensure /tmp directory paths for serverless write permissions
 
-$tmpDirs = [
-    '/tmp/storage/framework/views',
+$dirs = [
+    '/tmp/storage/app',
     '/tmp/storage/framework/cache',
+    '/tmp/storage/framework/views',
     '/tmp/storage/framework/sessions',
     '/tmp/storage/logs',
+    '/tmp/bootstrap/cache',
 ];
 
-foreach ($tmpDirs as $dir) {
+foreach ($dirs as $dir) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0755, true);
     }
 }
+
+putenv('APP_STORAGE=/tmp/storage');
+$_ENV['APP_STORAGE'] = '/tmp/storage';
+$_SERVER['APP_STORAGE'] = '/tmp/storage';
 
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
 putenv('APP_CONFIG_CACHE=/tmp/config.php');
