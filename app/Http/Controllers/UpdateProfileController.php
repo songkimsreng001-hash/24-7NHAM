@@ -29,10 +29,15 @@ class UpdateProfileController extends Controller
             abort(403);
         }
 
+        if ($request->has('phone')) {
+            $cleanPhone = preg_replace('/[^0-9]/', '', (string) $request->phone);
+            $request->merge(['phone' => $cleanPhone]);
+        }
+
         $rules = [
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email,'.$user->id],
-            'phone' => ['required', 'string', 'min:8', 'max:25', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'unique:users,phone,'.$user->id],
+            'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/', 'unique:users,phone,'.$user->id],
             'cropped_avatar_data' => [
                 'nullable',
                 'string',

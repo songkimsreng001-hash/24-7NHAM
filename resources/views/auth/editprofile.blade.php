@@ -210,7 +210,7 @@
                                 <span class="input-group-text bg-light text-secondary">
                                     <i class="bi bi-telephone"></i>
                                 </span>
-                                <input id="phone" type="tel" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') ?? auth()->user()->phone }}" required placeholder="e.g. 012 345 678">
+                                <input id="phone" type="tel" class="form-control font-monospace @error('phone') is-invalid @enderror" name="phone" value="{{ preg_replace('/[^0-9]/', '', old('phone') ?? (auth()->user()->phone ?? '')) }}" required placeholder="0123456789" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
                                 
                                 @error('phone')
                                     <span class="invalid-feedback" role="alert">
@@ -218,7 +218,7 @@
                                     </span>
                                 @enderror
                             </div>
-                            <div class="form-text small text-muted">Couriers will contact you at this number for order deliveries.</div>
+                            <div class="form-text small text-muted"><i class="bi bi-shield-check text-success me-1"></i>Numbers only (exactly 10 digits). Couriers will contact you at this number for order deliveries.</div>
                         </div>
 
                         @if(auth()->user()->isDriver())

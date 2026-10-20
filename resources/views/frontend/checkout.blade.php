@@ -27,7 +27,7 @@
                     <form id="quickPhoneForm" class="row g-2 align-items-center" style="max-width: 480px;">
                         @csrf
                         <div class="col-8">
-                            <input type="tel" id="quickPhoneInput" class="form-control rounded-3" placeholder="e.g. 012 345 678" required>
+                            <input type="tel" id="quickPhoneInput" class="form-control rounded-3 font-monospace" placeholder="0123456789 (10 digits)" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-warning w-100 fw-semibold rounded-3 text-dark" onclick="saveQuickPhone()">
@@ -35,6 +35,7 @@
                             </button>
                         </div>
                     </form>
+                    <div class="form-text small text-muted"><i class="bi bi-info-circle me-1"></i>Numbers only (exactly 10 digits)</div>
                     <div id="phoneAlertMsg" class="small mt-2 d-none"></div>
                 </div>
             </div>
@@ -248,10 +249,25 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="small text-muted mb-3">Drag the marker on the map to set your exact drop-off point. We calculate real-time distance and ETA automatically.</p>
+                <p class="small text-muted mb-2">Drag the marker on the map to set your exact drop-off point, or search an address or landmark below. We calculate real-time distance and ETA automatically.</p>
+
+                <!-- MAP LOCATION SEARCH BAR -->
+                <div class="mb-3 position-relative">
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-white border-end-0 text-success">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="mapSearchInput" class="form-control border-start-0 ps-0" placeholder="Search address, landmark, or area (e.g. Aeon Mall, Toul Kork, BKK1)..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();searchLocationOnMap();}">
+                        <button type="button" class="btn btn-success fw-semibold px-3" onclick="searchLocationOnMap()" id="btnMapSearch">
+                            <span id="mapSearchSpinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                            Search
+                        </button>
+                    </div>
+                    <div id="mapSearchFeedback" class="small text-muted mt-1"></div>
+                </div>
 
                 <!-- MAP CONTAINER -->
-                <div id="addressMap" style="height: 260px; width: 100%; border-radius: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;"></div>
+                <div id="addressMap" style="height: 280px; width: 100%; border-radius: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;"></div>
 
                 <div class="alert alert-light border d-flex justify-content-between align-items-center py-2 px-3 small mb-3">
                     <div>
@@ -277,11 +293,18 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small fw-semibold">Recipient Name <span class="text-danger">*</span></label>
-                            <input type="text" name="recipient_name" class="form-control rounded-3" value="{{ auth()->user()->name }}" required>
+                            <input type="text" name="recipient_name" id="modalRecipientName" class="form-control rounded-3 bg-light text-muted fw-semibold" value="{{ auth()->user()->name }}" readonly required style="cursor: not-allowed;" title="Recipient name automatically follows your account name and cannot be changed.">
+                            <div class="form-text text-muted" style="font-size: .72rem;">
+                                <i class="bi bi-lock-fill text-secondary me-1"></i>Follows user name (Cannot change)
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Contact Phone <span class="text-danger">*</span></label>
-                            <input type="tel" name="phone" id="modalPhone" class="form-control rounded-3" value="{{ auth()->user()->phone }}" placeholder="012 345 678" required>
+                            <label class="form-label small fw-semibold">Contact Phone (10 digits) <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone" id="modalPhone" class="form-control rounded-3 font-monospace" value="{{ preg_replace('/[^0-9]/', '', auth()->user()->phone ?? '') }}" placeholder="0123456789" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); updateModalPhoneCount();" required>
+                            <div class="form-text text-muted d-flex justify-content-between" style="font-size: .72rem;">
+                                <span><i class="bi bi-shield-check text-success me-1"></i>Numbers only</span>
+                                <span id="modalPhoneCounter" class="fw-semibold">0/10</span>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-semibold">Detailed Address Line <span class="text-danger">*</span></label>
@@ -393,6 +416,7 @@ function initLeafletMapModal() {
         } else {
             map.invalidateSize();
         }
+        updateModalPhoneCount();
     });
 }
 
@@ -409,14 +433,98 @@ function updatePinLocation(lat, lng) {
         .catch(console.error);
 }
 
+/* ========================================================
+   LOCATION SEARCH ON MAP
+======================================================== */
+function searchLocationOnMap() {
+    if (!map || !mapMarker) return;
+    const input = document.getElementById('mapSearchInput');
+    const query = input ? input.value.trim() : '';
+    const feedback = document.getElementById('mapSearchFeedback');
+    const spinner = document.getElementById('mapSearchSpinner');
+    const btn = document.getElementById('btnMapSearch');
+
+    if (!query) {
+        if (feedback) feedback.innerHTML = '<span class="text-danger fw-semibold">Please enter an address or landmark name to search.</span>';
+        return;
+    }
+
+    if (feedback) feedback.innerHTML = '<span class="text-muted">Searching map...</span>';
+    if (spinner) spinner.classList.remove('d-none');
+    if (btn) btn.disabled = true;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+            if (spinner) spinner.classList.add('d-none');
+            if (btn) btn.disabled = false;
+
+            if (data && data.length > 0) {
+                const item = data[0];
+                const lat = parseFloat(item.lat);
+                const lon = parseFloat(item.lon);
+
+                mapMarker.setLatLng([lat, lon]);
+                map.flyTo([lat, lon], 16, { duration: 1.2 });
+                updatePinLocation(lat, lon);
+
+                // Auto-fill address line
+                const addrLine = document.getElementById('modalAddressLine');
+                if (addrLine) {
+                    addrLine.value = item.display_name;
+                }
+
+                if (feedback) {
+                    const shortName = item.display_name.split(',').slice(0, 3).join(',');
+                    feedback.innerHTML = `<span class="text-success fw-semibold"><i class="bi bi-geo-alt-fill me-1"></i>Found: ${shortName} (Pin dropped & distance calculated)</span>`;
+                }
+            } else {
+                if (feedback) feedback.innerHTML = '<span class="text-warning fw-semibold">No location found matching that search. You can also drag the pin directly on the map.</span>';
+            }
+        })
+        .catch(() => {
+            if (spinner) spinner.classList.add('d-none');
+            if (btn) btn.disabled = false;
+            if (feedback) feedback.innerHTML = '<span class="text-danger">Location search service temporarily unavailable. You can drag the pin manually.</span>';
+        });
+}
+
+function updateModalPhoneCount() {
+    const phoneInput = document.getElementById('modalPhone');
+    const counter = document.getElementById('modalPhoneCounter');
+    if (phoneInput && counter) {
+        const val = phoneInput.value.replace(/[^0-9]/g, '');
+        counter.innerText = `${val.length}/10`;
+        if (val.length === 10) {
+            counter.className = 'fw-bold text-success';
+        } else {
+            counter.className = 'fw-semibold text-muted';
+        }
+    }
+}
+
 function saveNewAddress() {
     const form = document.getElementById('newAddressForm');
+    const phoneInput = document.getElementById('modalPhone');
+    const phone = phoneInput ? phoneInput.value.replace(/[^0-9]/g, '').trim() : '';
+
+    if (phone.length !== 10 || !/^[0-9]{10}$/.test(phone)) {
+        Swal.fire({
+            icon: 'warning',
+            title: '10 Digits Required',
+            text: 'Phone number must be exactly 10 digits (numbers only, e.g. 0123456789).'
+        });
+        if (phoneInput) phoneInput.focus();
+        return;
+    }
+
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
     }
 
     const formData = new FormData(form);
+    formData.set('phone', phone); // ensure clean 10 numeric digits
 
     fetch('{{ route('address.store') }}', {
         method: 'POST',
@@ -443,12 +551,13 @@ function saveNewAddress() {
    2. SAVE QUICK PHONE
 ======================================================== */
 function saveQuickPhone() {
-    const phone = document.getElementById('quickPhoneInput').value.trim();
+    const rawPhone = document.getElementById('quickPhoneInput').value.trim();
+    const phone = rawPhone.replace(/[^0-9]/g, '');
     const msgBox = document.getElementById('phoneAlertMsg');
 
-    if (!phone) {
-        msgBox.className = 'small mt-2 text-danger';
-        msgBox.innerText = 'Please enter a valid phone number.';
+    if (phone.length !== 10 || !/^[0-9]{10}$/.test(phone)) {
+        msgBox.className = 'small mt-2 text-danger fw-semibold';
+        msgBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>Phone number must be exactly 10 digits (numbers only).';
         msgBox.classList.remove('d-none');
         return;
     }

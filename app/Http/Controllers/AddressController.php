@@ -17,18 +17,29 @@ class AddressController extends Controller
 
     public function store(Request $request)
     {
+        // Strip non-numeric characters from phone
+        $cleanPhone = preg_replace('/[^0-9]/', '', (string) $request->phone);
+        $request->merge(['phone' => $cleanPhone]);
+
         $request->validate([
             'label' => 'required|string|max:50',
-            'recipient_name' => 'required|string|max:100',
-            'phone' => 'required|string|max:25',
+            'recipient_name' => 'nullable|string|max:100',
+            'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
             'address_line' => 'required|string|max:500',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'notes' => 'nullable|string|max:500',
             'is_default' => 'nullable|boolean',
+        ], [
+            'phone.regex' => 'The phone number must be exactly 10 digits (numbers only).',
         ]);
 
         $user = Auth::user();
+
+        // Save phone to user profile if empty
+        if (empty($user->phone)) {
+            $user->update(['phone' => $cleanPhone]);
+        }
 
         // If marked default or first address, unset previous defaults
         $isDefault = (bool) $request->input('is_default', false) || $user->addresses()->count() === 0;
@@ -39,8 +50,8 @@ class AddressController extends Controller
 
         $address = $user->addresses()->create([
             'label' => $request->label,
-            'recipient_name' => $request->recipient_name,
-            'phone' => $request->phone,
+            'recipient_name' => $user->name, // Strictly follows user account name and cannot be changed
+            'phone' => $cleanPhone,
             'address_line' => $request->address_line,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,

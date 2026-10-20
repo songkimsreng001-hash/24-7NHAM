@@ -176,7 +176,7 @@
     <!-- LIVE LEAFLET MAP TRACKING (IF NOT CANCELLED) -->
     @if(!$order->isCancelled())
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-            <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <div class="card-header bg-white py-3 px-4 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <h6 class="fw-bold text-dark mb-0">
                     <i class="bi bi-map-fill text-success me-2"></i>Live Delivery Route & Courier Position
                 </h6>
@@ -184,12 +184,40 @@
                     <i class="bi bi-broadcast me-1"></i> Live GPS Map
                 </span>
             </div>
-            <div class="card-body p-0">
-                <div id="liveTrackingMap" style="height: 320px; width: 100%;"></div>
+
+            <!-- LIVE MAP LOCATION SEARCH BAR -->
+            <div class="px-4 py-2 bg-light-subtle border-bottom">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0 text-success">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="liveMapSearchInput" class="form-control border-start-0 ps-0" placeholder="Search address or landmark on live map..." autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();searchLocationOnLiveMap();}">
+                            <button type="button" class="btn btn-success px-3 fw-semibold" onclick="searchLocationOnLiveMap()" id="btnLiveMapSearch">
+                                <span id="liveMapSearchSpinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-7 d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="resetLiveMapToRoute()">
+                            <i class="bi bi-crosshair me-1"></i> Focus Route
+                        </button>
+                        <span id="liveMapSearchFeedback" class="small text-muted text-truncate"></span>
+                    </div>
+                </div>
             </div>
-            <div class="card-footer bg-light-subtle py-2 px-4 d-flex justify-content-between align-items-center small text-muted">
+
+            <div class="card-body p-0">
+                <div id="liveTrackingMap" style="height: 340px; width: 100%;"></div>
+            </div>
+            <div class="card-footer bg-light-subtle py-2 px-4 d-flex flex-wrap justify-content-between align-items-center small text-muted gap-2">
                 <div>
                     <i class="bi bi-shop text-success me-1"></i> Store: 24/7 NHAM Hub
+                </div>
+                <div>
+                    <i class="bi bi-person-fill text-primary me-1"></i> Recipient: <strong class="text-dark">{{ $order->user ? $order->user->name : 'Customer' }}</strong>
                 </div>
                 <div>
                     <i class="bi bi-geo-alt-fill text-danger me-1"></i> Destination: {{ Str::limit($order->delivery_address, 45) }}
@@ -350,16 +378,26 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="mb-3">
-                        <div class="text-muted small fw-semibold">Address</div>
-                        <div class="text-dark small bg-light p-2 rounded-3 border mt-1">
-                            {{ $order->delivery_address ?: 'Registered Customer Address' }}
+                        <div class="text-muted small fw-semibold">Recipient Name</div>
+                        <div class="text-dark small bg-light p-2 rounded-3 border mt-1 fw-bold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-person-fill text-success me-1"></i>{{ $order->user ? $order->user->name : 'Customer' }}</span>
+                            <span class="badge bg-secondary-subtle text-secondary small" style="font-size: .7rem;" title="Recipient name strictly matches user account name and cannot be changed">
+                                <i class="bi bi-lock-fill me-1"></i>Account Name (Locked)
+                            </span>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <div class="text-muted small fw-semibold">Contact Phone</div>
-                        <div class="text-dark small mt-1">
+                        <div class="text-dark small mt-1 font-monospace">
                             <i class="bi bi-telephone text-success me-1"></i>{{ $order->customer_phone ?: 'N/A' }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small fw-semibold">Address</div>
+                        <div class="text-dark small bg-light p-2 rounded-3 border mt-1">
+                            {{ $order->delivery_address ?: 'Registered Customer Address' }}
                         </div>
                     </div>
 
@@ -620,6 +658,28 @@
 .step-desc {
     font-size: .72rem;
 }
+
+@media print {
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    nav, .breadcrumb, button, .btn, #liveTrackingMap, .card-header .badge, #orderChatBox, #orderChatForm, .card-footer, #reviewSection, footer, header {
+        display: none !important;
+    }
+    .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    .card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        margin-bottom: 1rem !important;
+    }
+    .card-body {
+        padding: 1.5rem !important;
+    }
+}
 </style>
 @endpush
 
@@ -635,6 +695,8 @@ const customerCoords = [
 
 let liveMap = null;
 let driverMarker = null;
+let routeLine = null;
+let liveSearchMarker = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     initLiveTrackingMap();
@@ -666,10 +728,10 @@ function initLiveTrackingMap() {
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
     });
-    L.marker(customerCoords, { icon: customerIcon }).addTo(liveMap).bindPopup('<strong>Your Delivery Destination</strong>');
+    L.marker(customerCoords, { icon: customerIcon }).addTo(liveMap).bindPopup('<strong>Your Delivery Destination</strong><br><small>Recipient: {{ $order->user ? $order->user->name : "Customer" }}</small>');
 
     // Route line
-    const routeLine = L.polyline([storeCoords, customerCoords], { color: '#16a34a', weight: 4, dashArray: '6, 8' }).addTo(liveMap);
+    routeLine = L.polyline([storeCoords, customerCoords], { color: '#16a34a', weight: 4, dashArray: '6, 8' }).addTo(liveMap);
     liveMap.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
 
     // Moving Driver Marker (Bicycle / Courier)
@@ -691,6 +753,75 @@ function initLiveTrackingMap() {
     driverMarker = L.marker([driverLat, driverLng], { icon: driverIcon }).addTo(liveMap)
         .bindPopup('<strong>{{ $order->driver ? $order->driver->name : "Courier" }} (Moving)</strong>')
         .openPopup();
+}
+
+/* ========================================================
+   LIVE MAP SEARCH LOCATION
+======================================================== */
+function searchLocationOnLiveMap() {
+    if (!liveMap) return;
+    const input = document.getElementById('liveMapSearchInput');
+    const query = input ? input.value.trim() : '';
+    const feedback = document.getElementById('liveMapSearchFeedback');
+    const spinner = document.getElementById('liveMapSearchSpinner');
+    const btn = document.getElementById('btnLiveMapSearch');
+
+    if (!query) {
+        if (feedback) feedback.innerHTML = '<span class="text-danger">Please enter a location or landmark.</span>';
+        return;
+    }
+
+    if (feedback) feedback.innerHTML = '<span class="text-muted">Searching map...</span>';
+    if (spinner) spinner.classList.remove('d-none');
+    if (btn) btn.disabled = true;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+            if (spinner) spinner.classList.add('d-none');
+            if (btn) btn.disabled = false;
+
+            if (data && data.length > 0) {
+                const item = data[0];
+                const lat = parseFloat(item.lat);
+                const lon = parseFloat(item.lon);
+
+                if (liveSearchMarker) {
+                    liveMap.removeLayer(liveSearchMarker);
+                }
+
+                const searchIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+                });
+
+                liveSearchMarker = L.marker([lat, lon], { icon: searchIcon }).addTo(liveMap)
+                    .bindPopup(`<strong>Found:</strong><br><small>${item.display_name}</small>`)
+                    .openPopup();
+
+                liveMap.flyTo([lat, lon], 16, { duration: 1.2 });
+                if (feedback) {
+                    const shortName = item.display_name.split(',').slice(0, 2).join(',');
+                    feedback.innerHTML = `<span class="text-success"><i class="bi bi-geo-alt-fill me-1"></i>${shortName}</span>`;
+                }
+            } else {
+                if (feedback) feedback.innerHTML = '<span class="text-warning">No location found matching that search.</span>';
+            }
+        })
+        .catch(() => {
+            if (spinner) spinner.classList.add('d-none');
+            if (btn) btn.disabled = false;
+            if (feedback) feedback.innerHTML = '<span class="text-danger">Search service temporarily unavailable.</span>';
+        });
+}
+
+function resetLiveMapToRoute() {
+    if (routeLine && liveMap) {
+        liveMap.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+        const feedback = document.getElementById('liveMapSearchFeedback');
+        if (feedback) feedback.innerHTML = '<span class="text-muted"><i class="bi bi-check2 me-1"></i>Refocused on delivery route.</span>';
+    }
 }
 
 /* ========================================================

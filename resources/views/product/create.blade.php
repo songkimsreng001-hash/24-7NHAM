@@ -105,11 +105,11 @@
                     </div>
 
                     <!-- Action Button Group -->
-                    <div class="btn-group" role="group" aria-label="Product Form Actions">
+                    <div aria-label="Product Form Actions">
                         <button type="submit" class="btn btn-primary" id="btnSubmit">
                             <i class="bi bi-check-lg me-1"></i>Create Product
                         </button>
-                        <a class="btn btn-secondary" href="{{ route('product.index') }}">
+                        <a class="btn btn-danger" href="{{ route('product.index') }}">
                             <i class="bi bi-arrow-left me-1"></i>Back
                         </a>
                     </div>

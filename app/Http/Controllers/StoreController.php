@@ -104,10 +104,14 @@ class StoreController extends Controller
     {
         $paymentMethod = $request->input('payment_method', 'card');
 
+        // Sanitize phone to strictly digits
+        $cleanPhone = preg_replace('/[^0-9]/', '', (string) $request->customer_phone);
+        $request->merge(['customer_phone' => $cleanPhone]);
+
         $rules = [
             'payment_method' => ['required', 'in:card,cod'],
             'delivery_address' => ['required', 'string', 'max:500'],
-            'customer_phone' => ['required', 'string', 'max:30', 'regex:/^([0-9\s\-\+\(\)]*)$/'],
+            'customer_phone' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
             'delivery_notes' => ['nullable', 'string', 'max:500'],
             'promo_code' => ['nullable', 'string', 'max:50'],
             'delivery_latitude' => ['nullable', 'numeric'],
@@ -120,7 +124,9 @@ class StoreController extends Controller
             $rules['payment_intent_id'] = ['required', 'string'];
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'customer_phone.regex' => 'Contact phone number must be exactly 10 digits (numbers only).',
+        ]);
 
         $cart = session()->get('cart', []);
         if (empty($cart)) {
