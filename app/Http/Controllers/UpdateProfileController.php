@@ -37,7 +37,25 @@ class UpdateProfileController extends Controller
         $rules = [
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'email', 'unique:users,email,'.$user->id],
-            'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/', 'unique:users,phone,'.$user->id],
+            'phone' => [
+                'required',
+                'string',
+                'unique:users,phone,'.$user->id,
+                function ($attribute, $value, $fail) {
+                    $clean = preg_replace('/[^0-9]/', '', (string) $value);
+                    if (!str_starts_with($clean, '0')) {
+                        $fail('The phone number must start with 0.');
+                    } elseif (str_starts_with($clean, '088') || str_starts_with($clean, '096')) {
+                        if (strlen($clean) !== 10) {
+                            $fail('Phone numbers starting with 088 or 096 must be exactly 10 digits.');
+                        }
+                    } else {
+                        if (strlen($clean) !== 9) {
+                            $fail('Phone numbers must be exactly 9 digits (or 10 digits for 088 and 096).');
+                        }
+                    }
+                },
+            ],
             'cropped_avatar_data' => [
                 'nullable',
                 'string',

@@ -389,8 +389,23 @@
 
                     <div class="mb-3">
                         <div class="text-muted small fw-semibold">Contact Phone</div>
-                        <div class="text-dark small mt-1 font-monospace">
-                            <i class="bi bi-telephone text-success me-1"></i>{{ $order->customer_phone ?: 'N/A' }}
+                        @php
+                            $rawPhone = preg_replace('/[^0-9]/', '', $order->customer_phone ?: '');
+                            if (strlen($rawPhone) === 10) {
+                                $displayPhone = substr($rawPhone, 0, 3) . ' ' . substr($rawPhone, 3, 3) . ' ' . substr($rawPhone, 6, 4);
+                            } elseif (strlen($rawPhone) === 9) {
+                                $displayPhone = substr($rawPhone, 0, 3) . ' ' . substr($rawPhone, 3, 3) . ' ' . substr($rawPhone, 6, 3);
+                            } else {
+                                $displayPhone = $order->customer_phone ?: 'N/A';
+                            }
+                        @endphp
+                        <div class="text-dark small mt-1 font-monospace fw-semibold d-flex align-items-center gap-2">
+                            <span><i class="bi bi-telephone text-success me-1"></i>{{ $displayPhone }}</span>
+                            @if(strlen($rawPhone) === 10)
+                                <span class="badge bg-light text-muted border" style="font-size: .68rem;">10 digits</span>
+                            @elseif(strlen($rawPhone) === 9)
+                                <span class="badge bg-light text-muted border" style="font-size: .68rem;">9 digits</span>
+                            @endif
                         </div>
                     </div>
 

@@ -111,7 +111,24 @@ class StoreController extends Controller
         $rules = [
             'payment_method' => ['required', 'in:card,cod'],
             'delivery_address' => ['required', 'string', 'max:500'],
-            'customer_phone' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
+            'customer_phone' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $clean = preg_replace('/[^0-9]/', '', (string) $value);
+                    if (!str_starts_with($clean, '0')) {
+                        $fail('The contact phone number must start with 0.');
+                    } elseif (str_starts_with($clean, '088') || str_starts_with($clean, '096')) {
+                        if (strlen($clean) !== 10) {
+                            $fail('Phone numbers starting with 088 or 096 must be exactly 10 digits.');
+                        }
+                    } else {
+                        if (strlen($clean) !== 9) {
+                            $fail('Phone numbers must be exactly 9 digits (or 10 digits for 088 and 096).');
+                        }
+                    }
+                },
+            ],
             'delivery_notes' => ['nullable', 'string', 'max:500'],
             'promo_code' => ['nullable', 'string', 'max:50'],
             'delivery_latitude' => ['nullable', 'numeric'],
@@ -124,9 +141,7 @@ class StoreController extends Controller
             $rules['payment_intent_id'] = ['required', 'string'];
         }
 
-        $request->validate($rules, [
-            'customer_phone.regex' => 'Contact phone number must be exactly 10 digits (numbers only).',
-        ]);
+        $request->validate($rules);
 
         $cart = session()->get('cart', []);
         if (empty($cart)) {

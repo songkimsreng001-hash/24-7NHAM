@@ -24,10 +24,10 @@
                     <p class="small text-muted mb-3">
                         Before placing an order, please enter your contact phone number so our delivery courier can reach you upon arrival.
                     </p>
-                    <form id="quickPhoneForm" class="row g-2 align-items-center" style="max-width: 480px;">
+                    <form id="quickPhoneForm" class="row g-2 align-items-center" style="max-width: 520px;">
                         @csrf
                         <div class="col-8">
-                            <input type="tel" id="quickPhoneInput" class="form-control rounded-3 font-monospace" placeholder="0123456789 (10 digits)" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
+                            <input type="tel" id="quickPhoneInput" class="form-control rounded-3 font-monospace" placeholder="012xxxxxx (9d) or 088/096 (10d)" maxlength="10" inputmode="numeric" oninput="handlePhoneInput(this, document.getElementById('quickPhoneCounter'))" required>
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-warning w-100 fw-semibold rounded-3 text-dark" onclick="saveQuickPhone()">
@@ -35,7 +35,10 @@
                             </button>
                         </div>
                     </form>
-                    <div class="form-text small text-muted"><i class="bi bi-info-circle me-1"></i>Numbers only (exactly 10 digits)</div>
+                    <div class="form-text small text-muted d-flex justify-content-between align-items-center mt-1">
+                        <span><i class="bi bi-info-circle me-1"></i>088 & 096 = 10 digits; all other numbers = 9 digits</span>
+                        <span id="quickPhoneCounter" class="fw-semibold">0/9 digits</span>
+                    </div>
                     <div id="phoneAlertMsg" class="small mt-2 d-none"></div>
                 </div>
             </div>
@@ -299,11 +302,11 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small fw-semibold">Contact Phone (10 digits) <span class="text-danger">*</span></label>
-                            <input type="tel" name="phone" id="modalPhone" class="form-control rounded-3 font-monospace" value="{{ preg_replace('/[^0-9]/', '', auth()->user()->phone ?? '') }}" placeholder="0123456789" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10); updateModalPhoneCount();" required>
+                            <label class="form-label small fw-semibold">Contact Phone <span class="text-danger">*</span></label>
+                            <input type="tel" name="phone" id="modalPhone" class="form-control rounded-3 font-monospace" value="{{ preg_replace('/[^0-9]/', '', auth()->user()->phone ?? '') }}" placeholder="012xxxxxx (9d) or 088/096 (10d)" maxlength="10" inputmode="numeric" oninput="handlePhoneInput(this, document.getElementById('modalPhoneCounter'))" required>
                             <div class="form-text text-muted d-flex justify-content-between" style="font-size: .72rem;">
-                                <span><i class="bi bi-shield-check text-success me-1"></i>Numbers only</span>
-                                <span id="modalPhoneCounter" class="fw-semibold">0/10</span>
+                                <span><i class="bi bi-shield-check text-success me-1"></i>088/096=10d, other=9d</span>
+                                <span id="modalPhoneCounter" class="fw-semibold">0/9 digits</span>
                             </div>
                         </div>
                         <div class="col-12">
@@ -416,7 +419,10 @@ function initLeafletMapModal() {
         } else {
             map.invalidateSize();
         }
-        updateModalPhoneCount();
+        const modalPhoneEl = document.getElementById('modalPhone');
+        if (modalPhoneEl) {
+            handlePhoneInput(modalPhoneEl, document.getElementById('modalPhoneCounter'));
+        }
     });
 }
 
@@ -489,30 +495,66 @@ function searchLocationOnMap() {
         });
 }
 
-function updateModalPhoneCount() {
-    const phoneInput = document.getElementById('modalPhone');
-    const counter = document.getElementById('modalPhoneCounter');
-    if (phoneInput && counter) {
-        const val = phoneInput.value.replace(/[^0-9]/g, '');
-        counter.innerText = `${val.length}/10`;
-        if (val.length === 10) {
-            counter.className = 'fw-bold text-success';
+function handlePhoneInput(input, counterEl) {
+    let val = input.value.replace(/[^0-9]/g, '');
+
+    // 088 and 096 need 10 digits; all other prefixes need 9 digits
+    const isTenDigit = val.startsWith('088') || val.startsWith('096');
+    const targetLength = isTenDigit ? 10 : 9;
+
+    if (val.length > targetLength) {
+        val = val.slice(0, targetLength);
+    }
+    input.value = val;
+    input.maxLength = targetLength;
+
+    if (counterEl) {
+        counterEl.innerText = `${val.length}/${targetLength} digits`;
+        if (val.length === targetLength && val.startsWith('0')) {
+            counterEl.className = 'fw-bold text-success';
         } else {
-            counter.className = 'fw-semibold text-muted';
+            counterEl.className = 'fw-semibold text-muted';
         }
     }
+}
+
+function validatePhoneNumber(phone) {
+    const clean = (phone || '').replace(/[^0-9]/g, '');
+
+    if (!clean.startsWith('0')) {
+        return { valid: false, message: 'Phone number must start with 0.' };
+    }
+
+    if (clean.startsWith('088') || clean.startsWith('096')) {
+        if (clean.length !== 10) {
+            return {
+                valid: false,
+                message: `Phone numbers starting with ${clean.slice(0, 3)} must be exactly 10 digits (currently ${clean.length}).`
+            };
+        }
+    } else {
+        if (clean.length !== 9) {
+            return {
+                valid: false,
+                message: `Phone numbers must be exactly 9 digits for this operator (088 and 096 require 10 digits). Currently ${clean.length} digits.`
+            };
+        }
+    }
+
+    return { valid: true, clean: clean };
 }
 
 function saveNewAddress() {
     const form = document.getElementById('newAddressForm');
     const phoneInput = document.getElementById('modalPhone');
-    const phone = phoneInput ? phoneInput.value.replace(/[^0-9]/g, '').trim() : '';
+    const rawPhone = phoneInput ? phoneInput.value : '';
+    const phoneCheck = validatePhoneNumber(rawPhone);
 
-    if (phone.length !== 10 || !/^[0-9]{10}$/.test(phone)) {
+    if (!phoneCheck.valid) {
         Swal.fire({
             icon: 'warning',
-            title: '10 Digits Required',
-            text: 'Phone number must be exactly 10 digits (numbers only, e.g. 0123456789).'
+            title: 'Invalid Phone Number',
+            text: phoneCheck.message
         });
         if (phoneInput) phoneInput.focus();
         return;
@@ -524,7 +566,7 @@ function saveNewAddress() {
     }
 
     const formData = new FormData(form);
-    formData.set('phone', phone); // ensure clean 10 numeric digits
+    formData.set('phone', phoneCheck.clean); // ensure clean numeric digits
 
     fetch('{{ route('address.store') }}', {
         method: 'POST',
@@ -551,13 +593,13 @@ function saveNewAddress() {
    2. SAVE QUICK PHONE
 ======================================================== */
 function saveQuickPhone() {
-    const rawPhone = document.getElementById('quickPhoneInput').value.trim();
-    const phone = rawPhone.replace(/[^0-9]/g, '');
+    const rawPhone = document.getElementById('quickPhoneInput').value;
+    const phoneCheck = validatePhoneNumber(rawPhone);
     const msgBox = document.getElementById('phoneAlertMsg');
 
-    if (phone.length !== 10 || !/^[0-9]{10}$/.test(phone)) {
+    if (!phoneCheck.valid) {
         msgBox.className = 'small mt-2 text-danger fw-semibold';
-        msgBox.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i>Phone number must be exactly 10 digits (numbers only).';
+        msgBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i>${phoneCheck.message}`;
         msgBox.classList.remove('d-none');
         return;
     }
@@ -573,7 +615,7 @@ function saveQuickPhone() {
         body: JSON.stringify({
             name: @json(auth()->user()->name),
             email: @json(auth()->user()->email),
-            phone: phone
+            phone: phoneCheck.clean
         })
     })
     .then(res => res.json())

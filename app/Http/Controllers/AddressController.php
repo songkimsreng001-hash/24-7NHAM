@@ -24,14 +24,29 @@ class AddressController extends Controller
         $request->validate([
             'label' => 'required|string|max:50',
             'recipient_name' => 'nullable|string|max:100',
-            'phone' => ['required', 'string', 'regex:/^[0-9]{10}$/'],
+            'phone' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $clean = preg_replace('/[^0-9]/', '', (string) $value);
+                    if (!str_starts_with($clean, '0')) {
+                        $fail('The phone number must start with 0.');
+                    } elseif (str_starts_with($clean, '088') || str_starts_with($clean, '096')) {
+                        if (strlen($clean) !== 10) {
+                            $fail('Phone numbers starting with 088 or 096 must be exactly 10 digits.');
+                        }
+                    } else {
+                        if (strlen($clean) !== 9) {
+                            $fail('Phone numbers must be exactly 9 digits (or 10 digits for 088 and 096).');
+                        }
+                    }
+                },
+            ],
             'address_line' => 'required|string|max:500',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'notes' => 'nullable|string|max:500',
             'is_default' => 'nullable|boolean',
-        ], [
-            'phone.regex' => 'The phone number must be exactly 10 digits (numbers only).',
         ]);
 
         $user = Auth::user();

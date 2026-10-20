@@ -210,7 +210,7 @@
                                 <span class="input-group-text bg-light text-secondary">
                                     <i class="bi bi-telephone"></i>
                                 </span>
-                                <input id="phone" type="tel" class="form-control font-monospace @error('phone') is-invalid @enderror" name="phone" value="{{ preg_replace('/[^0-9]/', '', old('phone') ?? (auth()->user()->phone ?? '')) }}" required placeholder="0123456789" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)">
+                                <input id="phone" type="tel" class="form-control font-monospace @error('phone') is-invalid @enderror" name="phone" value="{{ preg_replace('/[^0-9]/', '', old('phone') ?? (auth()->user()->phone ?? '')) }}" required placeholder="012xxxxxx (9d) or 088/096 (10d)" maxlength="10" inputmode="numeric" oninput="handleEditPhoneInput(this)">
                                 
                                 @error('phone')
                                     <span class="invalid-feedback" role="alert">
@@ -218,7 +218,10 @@
                                     </span>
                                 @enderror
                             </div>
-                            <div class="form-text small text-muted"><i class="bi bi-shield-check text-success me-1"></i>Numbers only (exactly 10 digits). Couriers will contact you at this number for order deliveries.</div>
+                            <div class="form-text small text-muted d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-shield-check text-success me-1"></i>088 & 096 = 10 digits; other numbers = 9 digits.</span>
+                                <span id="editPhoneCounter" class="fw-semibold">0/9 digits</span>
+                            </div>
                         </div>
 
                         @if(auth()->user()->isDriver())
@@ -593,6 +596,31 @@
                     }
                 });
             });
+        }
+
+        const editPhoneEl = document.getElementById('phone');
+        if (editPhoneEl) {
+            handleEditPhoneInput(editPhoneEl);
+        }
+
+        function handleEditPhoneInput(input) {
+            let val = input.value.replace(/[^0-9]/g, '');
+            const isTenDigit = val.startsWith('088') || val.startsWith('096');
+            const targetLength = isTenDigit ? 10 : 9;
+            if (val.length > targetLength) {
+                val = val.slice(0, targetLength);
+            }
+            input.value = val;
+            input.maxLength = targetLength;
+            const counter = document.getElementById('editPhoneCounter');
+            if (counter) {
+                counter.innerText = `${val.length}/${targetLength} digits`;
+                if (val.length === targetLength && val.startsWith('0')) {
+                    counter.className = 'fw-bold text-success';
+                } else {
+                    counter.className = 'fw-semibold text-muted';
+                }
+            }
         }
 
         // SweetAlert2 Toast for Flash Session Success
