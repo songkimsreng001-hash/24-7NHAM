@@ -221,4 +221,4 @@ vendor\bin\pint --test
 ---
 
 ## 📄 License
-This project is open-sourced software licensed under the [MIT license](LICENSE).
+This project is open-sourced software licensed under the @songkimsreng.
