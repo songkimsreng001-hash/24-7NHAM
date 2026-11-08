@@ -1,0 +1,60 @@
+<?php
+
+return [
+    // General
+    'home' => 'Home',
+    'products' => 'Products',
+    'categories' => 'Categories',
+    'about_us' => 'About Us',
+    'contact_us' => 'Contact Us',
+    'cart' => 'Cart',
+    'checkout' => 'Checkout',
+    'search' => 'Search',
+    'search_placeholder' => 'Search products, food...',
+    'language' => 'Language',
+    'khmer' => 'Khmer',
+    'english' => 'English',
+    'dark_mode' => 'Dark Mode',
+    'light_mode' => 'Light Mode',
+
+    // Auth & Profile
+    'login' => 'Login',
+    'register' => 'Register',
+    'logout' => 'Logout',
+    'profile' => 'My Profile',
+    'account_profile' => 'Account Profile',
+    'edit_profile' => 'Edit Profile',
+    'order_history' => 'My Order History',
+    'track_shipments' => 'Track Shipments',
+    'saved_favorites' => 'Saved Favorites',
+    'notifications' => 'Notifications',
+    'support_chat' => 'Support & Chat',
+    'courier_portal' => 'Courier Portal',
+    'admin_dashboard' => 'Admin Dashboard',
+
+    // Product & Orders
+    'price' => 'Price',
+    'quantity' => 'Quantity',
+    'total' => 'Total',
+    'subtotal' => 'Subtotal',
+    'status' => 'Status',
+    'actions' => 'Actions',
+    'view' => 'View',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'save' => 'Save',
+    'cancel' => 'Cancel',
+    'filter_by_category' => 'Filter by Category',
+    'all_categories' => 'All Categories',
+    'no_products_found' => 'No products found',
+
+    // Backend
+    'dashboard' => 'Dashboard',
+    'product_catalog' => 'Product Catalog',
+    'product_list' => 'Product List',
+    'create_product' => 'Create Product',
+    'edit_product' => 'Edit Product',
+    'promos' => 'Promo Codes',
+    'orders' => 'Orders',
+    'users' => 'Users',
+];

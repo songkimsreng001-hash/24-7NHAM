@@ -763,6 +763,9 @@
             .profile-text { display:none; }
             .profile { padding-left:5px;border-left:0; }
             .top-icon { display:none; }
+            .top-icon.top-lang-btn,
+            .top-icon.admin-theme-toggle-btn,
+            .lang-switch-box { display:inline-flex !important; }
             .global-search { max-width:none; }
             .global-search input { padding-right:14px; }
             .search-key { display:none; }
@@ -783,6 +786,89 @@
             .page-header h1 { font-size:24px; }
             .header-actions { flex-direction:column; }
             .header-actions a { width:100%; }
+        }
+
+        /* =========================================================
+           RECTANGULAR LANGUAGE SWITCHER (EN / KH)
+        ========================================================= */
+        .lang-switch-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            padding: 0 11px;
+            border: 1.5px solid #0f172a;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Times New Roman', Times, Georgia, serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+            user-select: none;
+            transition: all .18s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .lang-switch-box:hover {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #000000;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(15, 23, 42, 0.1);
+        }
+        .lang-switch-box:active {
+            transform: translateY(0);
+        }
+        .lang-switch-box .lang-code {
+            display: inline-block;
+            transition: opacity .18s ease, color .18s ease;
+        }
+        .lang-switch-box .lang-code.active {
+            opacity: 1;
+            font-weight: 800;
+        }
+        .lang-switch-box .lang-code.dim {
+            opacity: 0.45;
+            font-weight: 700;
+        }
+        .lang-switch-box .lang-sep {
+            margin: 0 5px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        /* Dark Mode adaptation for EN / KH box (Backend) */
+        html[data-bs-theme="dark"] .lang-switch-box,
+        html[data-theme="dark"] .lang-switch-box {
+            background: #14201a;
+            border-color: #cbd5e1;
+            color: #f8fafc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        html[data-bs-theme="dark"] .lang-switch-box:hover,
+        html[data-theme="dark"] .lang-switch-box:hover {
+            background: #1a2f23;
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-code.active,
+        html[data-theme="dark"] .lang-switch-box .lang-code.active {
+            opacity: 1;
+            color: #ffffff;
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-code.dim,
+        html[data-theme="dark"] .lang-switch-box .lang-code.dim {
+            opacity: 0.45;
+            color: #94a3b8;
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-sep,
+        html[data-theme="dark"] .lang-switch-box .lang-sep {
+            opacity: 0.65;
+            color: #cbd5e1;
         }
 
         /* =========================================================
@@ -1432,11 +1518,11 @@
                 <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9aa8a1;">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
                 </span>
-                <input id="sidebarSearch" type="search" placeholder="Search menu..." style="width:100%;height:38px;border:1px solid #e6ece9;background:#f7faf8;border-radius:10px;padding:0 10px 0 34px;outline:none;color:#31433a;font-size:11px;">
+                <input id="sidebarSearch" type="search" placeholder="{{ __('Search menu...') }}" style="width:100%;height:38px;border:1px solid #e6ece9;background:#f7faf8;border-radius:10px;padding:0 10px 0 34px;outline:none;color:#31433a;font-size:11px;">
             </div>
         </div>
         <div class="sidebar-scroll" id="sidebarScroll">
-            <div class="sidebar-label">Navigation</div>
+            <div class="sidebar-label">{{ __('Navigation') }}</div>
             <nav class="sidebar-nav">
                 {{-- Group: Dashboard --}}
                 @php
@@ -1445,20 +1531,20 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isDashboardActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-dashboard"
-                            aria-expanded="{{ $isDashboardActive ? 'true' : 'false' }}" aria-controls="group-dashboard" title="Dashboard">
+                            aria-expanded="{{ $isDashboardActive ? 'true' : 'false' }}" aria-controls="group-dashboard" title="{{ __('Dashboard') }}">
                         <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span>
-                        <span class="nav-group-title">Dashboard</span>
+                        <span class="nav-group-title">{{ __('Dashboard') }}</span>
                         <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
                     <div class="collapse nav-group-collapse {{ $isDashboardActive ? 'show' : '' }}" id="group-dashboard" data-initially-open="{{ $isDashboardActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('dashboard') }}" class="nav-sub-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="Dashboard">
+                            <a href="{{ route('dashboard') }}" class="nav-sub-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" title="{{ __('Dashboard') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Dashboard</span>
+                                <span class="nav-text">{{ __('Dashboard') }}</span>
                             </a>
-                            <a href="{{ route('admin.analytics') }}" class="nav-sub-item {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}" title="Analytics & KPIs">
+                            <a href="{{ route('admin.analytics') }}" class="nav-sub-item {{ request()->routeIs('admin.analytics*') ? 'active' : '' }}" title="{{ __('Analytics & KPIs') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Analytics & KPIs</span>
+                                <span class="nav-text">{{ __('Analytics & KPIs') }}</span>
                             </a>
                         </div>
                     </div>
@@ -1471,20 +1557,20 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isCatalogActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-catalog"
-                            aria-expanded="{{ $isCatalogActive ? 'true' : 'false' }}" aria-controls="group-catalog" title="Catalog & Menu">
+                            aria-expanded="{{ $isCatalogActive ? 'true' : 'false' }}" aria-controls="group-catalog" title="{{ __('Catalog & Menu') }}">
                         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m5 7 7-3 7 3-7 3z"/><path d="M5 7v10l7 3 7-3V7M12 10v10"/></svg></span>
-                        <span class="nav-group-title">Catalog & Menu</span>
+                        <span class="nav-group-title">{{ __('Catalog & Menu') }}</span>
                         <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
                     <div class="collapse nav-group-collapse {{ $isCatalogActive ? 'show' : '' }}" id="group-catalog" data-initially-open="{{ $isCatalogActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('product.index') }}" class="nav-sub-item {{ request()->routeIs('product.*') ? 'active' : '' }}" title="Products">
+                            <a href="{{ route('product.index') }}" class="nav-sub-item {{ request()->routeIs('product.*') ? 'active' : '' }}" title="{{ __('Products') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Products</span>
+                                <span class="nav-text">{{ __('Products') }}</span>
                             </a>
-                            <a href="{{ route('category.list') }}" class="nav-sub-item {{ request()->routeIs('category.*') ? 'active' : '' }}" title="Categories">
+                            <a href="{{ route('category.list') }}" class="nav-sub-item {{ request()->routeIs('category.*') ? 'active' : '' }}" title="{{ __('Categories') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Categories</span>
+                                <span class="nav-text">{{ __('Categories') }}</span>
                             </a>
                         </div>
                     </div>
@@ -1498,9 +1584,9 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isOrdersActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-orders"
-                            aria-expanded="{{ $isOrdersActive ? 'true' : 'false' }}" aria-controls="group-orders" title="Orders & Deliveries">
+                            aria-expanded="{{ $isOrdersActive ? 'true' : 'false' }}" aria-controls="group-orders" title="{{ __('Orders & Delivery') }}">
                         <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg></span>
-                        <span class="nav-group-title">Orders & Delivery</span>
+                        <span class="nav-group-title">{{ __('Orders & Delivery') }}</span>
                         @if($sidebarOrderCount)
                             <span class="nav-badge me-1">{{ $sidebarOrderCount > 99 ? '99+' : $sidebarOrderCount }}</span>
                         @endif
@@ -1508,16 +1594,16 @@
                     </button>
                     <div class="collapse nav-group-collapse {{ $isOrdersActive ? 'show' : '' }}" id="group-orders" data-initially-open="{{ $isOrdersActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('admin.order') }}" class="nav-sub-item {{ request()->routeIs('admin.order*') ? 'active' : '' }}" title="All Orders">
+                            <a href="{{ route('admin.order') }}" class="nav-sub-item {{ request()->routeIs('admin.order*') ? 'active' : '' }}" title="{{ __('All Orders') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">All Orders</span>
+                                <span class="nav-text">{{ __('All Orders') }}</span>
                                 @if($sidebarOrderCount)
                                     <span class="nav-badge ms-auto">{{ $sidebarOrderCount > 99 ? '99+' : $sidebarOrderCount }}</span>
                                 @endif
                             </a>
-                            <a href="{{ route('admin.orders.active') }}" class="nav-sub-item {{ request()->routeIs('admin.orders.active') ? 'active' : '' }}" title="Active Deliveries">
+                            <a href="{{ route('admin.orders.active') }}" class="nav-sub-item {{ request()->routeIs('admin.orders.active') ? 'active' : '' }}" title="{{ __('Active Deliveries') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Active Deliveries</span>
+                                <span class="nav-text">{{ __('Active Deliveries') }}</span>
                             </a>
                         </div>
                     </div>
@@ -1530,27 +1616,27 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isMarketingActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-marketing"
-                            aria-expanded="{{ $isMarketingActive ? 'true' : 'false' }}" aria-controls="group-marketing" title="Marketing & Promos">
+                            aria-expanded="{{ $isMarketingActive ? 'true' : 'false' }}" aria-controls="group-marketing" title="{{ __('Marketing & Promos') }}">
                         <span class="nav-icon"><i class="bi bi-megaphone"></i></span>
-                        <span class="nav-group-title">Marketing & Promos</span>
+                        <span class="nav-group-title">{{ __('Marketing & Promos') }}</span>
                         <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
                     <div class="collapse nav-group-collapse {{ $isMarketingActive ? 'show' : '' }}" id="group-marketing" data-initially-open="{{ $isMarketingActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('admin.promos') }}" class="nav-sub-item {{ request()->routeIs('admin.promos*') ? 'active' : '' }}" title="Promo Codes">
+                            <a href="{{ route('admin.promos') }}" class="nav-sub-item {{ request()->routeIs('admin.promos*') ? 'active' : '' }}" title="{{ __('Promo Codes') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Promo Codes</span>
+                                <span class="nav-text">{{ __('Promo Codes') }}</span>
                             </a>
-                            <a href="{{ route('admin.broadcast') }}" class="nav-sub-item {{ request()->routeIs('admin.broadcast*') ? 'active' : '' }}" title="Broadcast Alerts">
+                            <a href="{{ route('admin.broadcast') }}" class="nav-sub-item {{ request()->routeIs('admin.broadcast*') ? 'active' : '' }}" title="{{ __('Broadcast Alerts') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Broadcast Alerts</span>
+                                <span class="nav-text">{{ __('Broadcast Alerts') }}</span>
                             </a>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <div class="sidebar-label">System & Account</div>
+            <div class="sidebar-label">{{ __('System & Account') }}</div>
             <nav class="sidebar-nav">
                 {{-- Group: Administration --}}
                 @php
@@ -1559,24 +1645,24 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isAdminActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-admin"
-                            aria-expanded="{{ $isAdminActive ? 'true' : 'false' }}" aria-controls="group-admin" title="Administration">
+                            aria-expanded="{{ $isAdminActive ? 'true' : 'false' }}" aria-controls="group-admin" title="{{ __('Administration') }}">
                         <span class="nav-icon"><i class="bi bi-shield-lock"></i></span>
-                        <span class="nav-group-title">Administration</span>
+                        <span class="nav-group-title">{{ __('Administration') }}</span>
                         <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
                     <div class="collapse nav-group-collapse {{ $isAdminActive ? 'show' : '' }}" id="group-admin" data-initially-open="{{ $isAdminActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('admin.users') }}" class="nav-sub-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}" title="Users & Couriers">
+                            <a href="{{ route('admin.users') }}" class="nav-sub-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}" title="{{ __('Users & Couriers') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Users & Couriers</span>
+                                <span class="nav-text">{{ __('Users & Couriers') }}</span>
                             </a>
-                            <a href="{{ route('admin.disputes') }}" class="nav-sub-item {{ request()->routeIs('admin.disputes*') ? 'active' : '' }}" title="Disputes Queue">
+                            <a href="{{ route('admin.disputes') }}" class="nav-sub-item {{ request()->routeIs('admin.disputes*') ? 'active' : '' }}" title="{{ __('Disputes Queue') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Disputes Queue</span>
+                                <span class="nav-text">{{ __('Disputes Queue') }}</span>
                             </a>
-                            <a href="{{ route('admin.audit') }}" class="nav-sub-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}" title="Audit Trail">
+                            <a href="{{ route('admin.audit') }}" class="nav-sub-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}" title="{{ __('Audit Trail') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Audit Trail</span>
+                                <span class="nav-text">{{ __('Audit Trail') }}</span>
                             </a>
                         </div>
                     </div>
@@ -1589,47 +1675,41 @@
                 <div class="nav-group">
                     <button type="button" class="nav-group-toggle {{ $isAccountActive ? 'has-active-child' : '' }}"
                             data-bs-target="#group-account"
-                            aria-expanded="{{ $isAccountActive ? 'true' : 'false' }}" aria-controls="group-account" title="Account & Settings">
+                            aria-expanded="{{ $isAccountActive ? 'true' : 'false' }}" aria-controls="group-account" title="{{ __('Account & Settings') }}">
                         <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-3.4 3.2-5 7-5s6.2 1.6 7 5"/></svg></span>
-                        <span class="nav-group-title">Account & Settings</span>
+                        <span class="nav-group-title">{{ __('Account & Settings') }}</span>
                         <i class="bi bi-chevron-down nav-group-chevron"></i>
                     </button>
                     <div class="collapse nav-group-collapse {{ $isAccountActive ? 'show' : '' }}" id="group-account" data-initially-open="{{ $isAccountActive ? 'true' : 'false' }}">
                         <div class="nav-group-items">
-                            <a href="{{ route('profile.edit', auth()->id()) }}" class="nav-sub-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" title="Profile">
+                            <a href="{{ auth()->id() ? route('profile.edit', auth()->id()) : route('login') }}" class="nav-sub-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" title="{{ __('Profile') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Profile</span>
+                                <span class="nav-text">{{ __('Profile') }}</span>
                             </a>
-                            <a href="{{ url('/contact') }}" class="nav-sub-item" title="Help & Support">
+                            <a href="{{ url('/contact') }}" class="nav-sub-item" title="{{ __('Help & Support') }}">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text">Help & Support</span>
+                                <span class="nav-text">{{ __('Help & Support') }}</span>
                             </a>
 
                             <!-- Theme Mode Toggle at Sidebar -->
                             <button type="button" class="nav-sub-item logout-button admin-theme-toggle-btn w-100 border-0 bg-transparent text-start" id="sidebarThemeToggle" title="Toggle Light / Dark Mode">
                                 <span class="nav-sub-dot"></span>
-                                <span class="nav-text admin-theme-label">Dark Mode</span>
+                                <span class="nav-text admin-theme-label">{{ __('Dark Mode') }}</span>
                                 <span class="nav-badge admin-theme-badge ms-auto" style="font-size: 9px; padding: 2px 7px;">Light</span>
                             </button>
 
                             <!-- Log Out Form -->
                             <form action="{{ route('logout') }}" method="POST" class="logout-form m-0">
                                 @csrf
-                                <button type="submit" class="nav-sub-item logout-button w-100 border-0 bg-transparent text-start" title="Log Out">
+                                <button type="submit" class="nav-sub-item logout-button w-100 border-0 bg-transparent text-start" title="{{ __('Log Out') }}">
                                     <span class="nav-sub-dot"></span>
-                                    <span class="nav-text">Log Out</span>
+                                    <span class="nav-text">{{ __('Log Out') }}</span>
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </nav>
-
-            <div class="sidebar-promo">
-                <div class="promo-title">Manage your shop faster</div>
-                <div class="promo-text">Add products and keep your orders organized from one place.</div>
-                <a class="promo-btn" href="{{ route('product.create') }}">Add Product</a>
-            </div>
         </div>
 
         <div class="sidebar-user" title="{{ auth()->user()->name ?? 'Administrator' }}">
@@ -1654,12 +1734,28 @@
 
         <form class="global-search" id="globalSearchForm" action="{{ url('/search') }}" method="GET" autocomplete="off">
             <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>
-            <input id="globalSearchInput" name="keyword" type="search" placeholder="Search products..." autocomplete="off">
+            <input id="globalSearchInput" name="keyword" type="search" placeholder="{{ __('Search products...') }}" autocomplete="off">
             <span class="search-key">Ctrl K</span>
             <div id="globalSearchResults" class="global-search-results"></div>
         </form>
 
         <div class="top-actions">
+            @php
+                $isKhmerBackend = in_array(session('locale'), ['kh', 'km', 'khmer', 'khmer_unicode']) || in_array(app()->getLocale(), ['kh', 'km', 'khmer', 'khmer_unicode']);
+                $targetLocale = $isKhmerBackend ? 'english' : 'khmer_unicode';
+                $tooltipTitle = $isKhmerBackend ? 'Switch to English (EN)' : 'ប្តូរជាភាសាខ្មែរ (KH)';
+            @endphp
+            <!-- Backend Language Switch Button: Rectangular EN / KH Box -->
+            <a href="{{ route('lang.switch', $targetLocale) }}" 
+               class="lang-switch-box text-decoration-none" 
+               id="backendLangToggleBtn"
+               title="{{ $tooltipTitle }}"
+               aria-label="{{ $tooltipTitle }}">
+                <span class="lang-code {{ !$isKhmerBackend ? 'active' : 'dim' }}">EN</span>
+                <span class="lang-sep">/</span>
+                <span class="lang-code {{ $isKhmerBackend ? 'active' : 'dim' }}">KH</span>
+            </a>
+
             <!-- Topbar Theme Toggle Button -->
             <button class="top-icon admin-theme-toggle-btn" id="topbarThemeToggle" type="button" aria-label="Toggle theme" title="Toggle Light / Dark Mode">
                 <i class="bi bi-moon-stars-fill text-warning theme-icon-dark" style="font-size: 16px;"></i>

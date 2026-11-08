@@ -14,11 +14,18 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $query = Product::with('category')->latest();
 
-        return view('product.index')->with('products', $products);
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $products = $query->get();
+        $categories = Category::withCount('products')->orderBy('name')->get();
+
+        return view('product.index', compact('products', 'categories'));
     }
 
     /**
@@ -26,12 +33,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = [];
-        foreach (Category::all() as $category) {
-            $categories[$category->id] = $category->name;
-        }
+        $categories = Category::orderBy('name')->pluck('name', 'id')->toArray();
 
-        return view('product.create')->with('categories', $categories);
+        return view('product.create', compact('categories'));
     }
 
     /**
@@ -40,36 +44,40 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:50|min:3',
-            'category_id' => 'required|integer',
-            'price' => 'required|max:20|min:3',
-            'image' => 'required|mimes:jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP',
-            'description' => 'required|max:1000|min:10',
+            'name' => 'required|string|max:100|min:2',
+            'category_id' => 'required|integer|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'image' => 'required|image|mimes:jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP|max:5120',
+            'description' => 'required|string|max:1000|min:5',
         ]);
 
         if ($validator->fails()) {
-            return redirect('product/create')
+            return redirect()->route('product.create')
                 ->withInput()
                 ->withErrors($validator);
         }
 
-        // Create The product
+        // Upload Product Image
         $image = $request->file('image');
-        $upload = 'img/';
-        $extension = substr($image->getClientOriginalName(), -4);
-        $filename = substr($image->getClientOriginalName(), 0, -4).time().$extension;
-        move_uploaded_file($image->getPathName(), $upload.$filename);
+        $uploadDir = public_path('img/');
+        if (!file_exists($uploadDir)) {
+            @mkdir($uploadDir, 0755, true);
+        }
+        $extension = $image->getClientOriginalExtension() ?: 'png';
+        $filename = time() . '_' . uniqid() . '.' . $extension;
+        $image->move($uploadDir, $filename);
 
         $product = new Product;
-        $product->name = $request->name;
-        $product->category_id = $request->category_id;
-        $product->price = $request->price;
+        $product->name = $request->input('name');
+        $product->category_id = $request->input('category_id');
+        $product->price = $request->input('price');
         $product->image = $filename;
-        $product->description = $request->description;
+        $product->description = $request->input('description');
         $product->save();
-        Session::flash('product_create', 'New data is created.');
 
-        return redirect('product/create');
+        Session::flash('product_create', 'Product "' . $product->name . '" has been created successfully!');
+
+        return redirect()->route('product.index');
     }
 
     /**
@@ -77,9 +85,9 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::with('category')->findOrFail($id);
 
-        return view('product.show')->with('product', $product);
+        return view('product.show', compact('product'));
     }
 
     /**
@@ -87,13 +95,10 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $categories = [];
-        foreach (Category::all() as $category) {
-            $categories[$category->id] = $category->name;
-        }
-        $product = Product::findOrFail($id);
+        $product = Product::with('category')->findOrFail($id);
+        $categories = Category::orderBy('name')->pluck('name', 'id')->toArray();
 
-        return view('product.edit')->with('product', $product)->with('categories', $categories);
+        return view('product.edit', compact('product', 'categories'));
     }
 
     /**
@@ -101,41 +106,50 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $product = Product::findOrFail($id);
+
         $validator = Validator::make($request->all(), [
-            'name' => 'required|max:50|min:3',
-            'category_id' => 'required|integer',
-            'price' => 'required|max:20|min:3',
-            'image' => 'mimes:jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP',
-            'description' => 'required|max:1000|min:10',
+            'name' => 'required|string|max:100|min:2',
+            'category_id' => 'required|integer|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,JPG,JPEG,PNG,GIF,WEBP|max:5120',
+            'description' => 'required|string|max:1000|min:5',
         ]);
 
         if ($validator->fails()) {
-            return redirect('product/'.$id.'/edit')
+            return redirect()->route('product.edit', $id)
                 ->withInput()
                 ->withErrors($validator);
         }
-        $product = Product::find($id);
-        // Create The Post
-        if ($request->file('image') != '') {
-            $image = $request->file('image');
-            $upload = 'img/';
-            $filename = time().$image->getClientOriginalName();
-            move_uploaded_file($image->getPathName(), $upload.$filename);
-        }
 
-        $product->name = $request->Input('name');
-        $product->category_id = $request->Input('category_id');
-        $product->price = $request->Input('price');
-        if (isset($filename)) {
+        // Handle Image Replacement
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadDir = public_path('img/');
+            if (!file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            $extension = $image->getClientOriginalExtension() ?: 'png';
+            $filename = time() . '_' . uniqid() . '.' . $extension;
+            $image->move($uploadDir, $filename);
+
+            // Clean up old image if exists locally
+            if ($product->image && file_exists(public_path('img/' . $product->image))) {
+                @unlink(public_path('img/' . $product->image));
+            }
+
             $product->image = $filename;
         }
 
-        $product->description = $request->Input('description');
+        $product->name = $request->input('name');
+        $product->category_id = $request->input('category_id');
+        $product->price = $request->input('price');
+        $product->description = $request->input('description');
         $product->save();
 
-        Session::flash('product_update', 'Data is updated');
+        Session::flash('product_update', 'Product "' . $product->name . '" has been updated successfully!');
 
-        return redirect('product/'.$product->id.'/edit');
+        return redirect()->route('product.index');
     }
 
     /**
@@ -143,12 +157,14 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $product = Product::find($id);
-        $image_path = 'img/'.$product->image;
-        File::delete($image_path);
+        $product = Product::findOrFail($id);
+        if ($product->image && file_exists(public_path('img/' . $product->image))) {
+            @unlink(public_path('img/' . $product->image));
+        }
+        $name = $product->name;
         $product->delete();
-        Session::flash('product_delete', 'Data is deleted.');
+        Session::flash('product_delete', 'Product "' . $name . '" has been deleted.');
 
-        return redirect('product');
+        return redirect()->route('product.index');
     }
 }

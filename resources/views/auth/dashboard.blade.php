@@ -49,15 +49,15 @@
 
 <div class="page-header">
     <div class="dashboard-subtitle">
-        <h1>Dashboard</h1>
-        <p>Overview of your products, orders, customers, and shop performance.</p>
+        <h1>{{ __('Dashboard') }}</h1>
+        <p>{{ __('Overview of your products, orders, customers, and shop performance.') }}</p>
     </div>
     <div class="header-actions">
         <a href="{{ route('product.create') }}" class="btn-primary-green">
-            <span>+</span> Add Product
+            <span>+</span> {{ __('Add Product') }}
         </a>
         <a href="{{ route('admin.order') }}" class="btn-outline-green">
-            View Orders
+            {{ __('View Orders') }}
         </a>
     </div>
 </div>
@@ -68,36 +68,36 @@
         <a href="{{ route('product.index') }}" class="stat-link" aria-label="View products">
             <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>
         </a>
-        <div class="stat-label">Total Products</div>
+        <div class="stat-label">{{ __('Total Products') }}</div>
         <div class="stat-value">{{ number_format($totalProducts) }}</div>
-        <div class="stat-trend">Your current product catalog</div>
+        <div class="stat-trend">{{ __('Your current product catalog') }}</div>
     </div>
 
     <div class="stat-card">
         <a href="{{ route('admin.order') }}" class="stat-corner-link" aria-label="View orders">
             <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>
         </a>
-        <div class="stat-label">Total Orders</div>
+        <div class="stat-label">{{ __('Total Orders') }}</div>
         <div class="stat-value">{{ number_format($totalOrders) }}</div>
-        <div class="stat-trend"><span class="trend-badge">All orders</span></div>
+        <div class="stat-trend"><span class="trend-badge">{{ __('All orders') }}</span></div>
     </div>
 
     <div class="stat-card">
-        <a href="{{ route('profile.edit', auth()->id()) }}" class="stat-corner-link" aria-label="View profile">
+        <a href="{{ auth()->id() ? route('profile.edit', auth()->id()) : route('login') }}" class="stat-corner-link" aria-label="View profile">
             <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg>
         </a>
-        <div class="stat-label">Customers</div>
+        <div class="stat-label">{{ __('Customers') }}</div>
         <div class="stat-value">{{ number_format($totalCustomers) }}</div>
-        <div class="stat-trend"><span class="trend-badge">Registered users</span></div>
+        <div class="stat-trend"><span class="trend-badge">{{ __('Registered users') }}</span></div>
     </div>
 
     <div class="stat-card">
         <span class="stat-corner-link" style="cursor:default" aria-hidden="true">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M14.5 9.5c-.6-.7-1.4-1-2.6-1-1.5 0-2.5.7-2.5 1.8 0 1.2 1 1.6 2.6 1.9 1.7.3 2.7.8 2.7 2.1 0 1.1-1 2.2-2.8 2.2-1.3 0-2.3-.4-3-1.2M12 7v10"/></svg>
         </span>
-        <div class="stat-label">Paid Revenue</div>
+        <div class="stat-label">{{ __('Paid Revenue') }}</div>
         <div class="stat-value">${{ number_format($totalRevenue, 2) }}</div>
-        <div class="stat-trend"><span class="trend-badge">Paid orders</span></div>
+        <div class="stat-trend"><span class="trend-badge">{{ __('Paid orders') }}</span></div>
     </div>
 </div>
 
@@ -107,10 +107,10 @@
     <div class="panel">
         <div class="panel-header">
             <div>
-                <h2 class="panel-title">Sales Analytics</h2>
+                <h2 class="panel-title">{{ __('Sales Analytics') }}</h2>
                 <div class="sales-total">This week <strong>${{ number_format($weeklySales->sum('revenue'), 2) }}</strong></div>
             </div>
-            <span class="panel-badge">Current week</span>
+            <span class="panel-badge">{{ __('Current week') }}</span>
         </div>
         <div class="panel-body">
             <div class="bar-chart-wrap">
@@ -122,7 +122,7 @@
                     <div class="bar-col">
                         <div class="bar-track">
                             <div class="bar {{ $isToday ? 'active' : ($sale['revenue'] > 0 ? 'filled' : 'striped') }}"
-                                 style="height:{{ $height }}%">
+                                 style="height:{{ $height }}%;">
                                 <span class="chart-tooltip">${{ number_format($sale['revenue'], 2) }}</span>
                             </div>
                         </div>
@@ -133,11 +133,11 @@
             <div class="mini-stats">
                 <div class="mini-stat">
                     <strong>{{ $approvedOrders }}</strong>
-                    <span>Approved orders</span>
+                    <span>{{ __('Approved orders') }}</span>
                 </div>
                 <div class="mini-stat">
                     <strong>{{ $pendingOrders }}</strong>
-                    <span>Paid / processing</span>
+                    <span>{{ __('Paid / processing') }}</span>
                 </div>
             </div>
         </div>
@@ -145,26 +145,26 @@
 
     <div class="panel">
         <div class="panel-header">
-            <h2 class="panel-title">Reminders</h2>
+            <h2 class="panel-title">{{ __('Reminders') }}</h2>
             <a href="{{ route('admin.order') }}" class="panel-action-btn">Review</a>
         </div>
         <div class="panel-body">
             <div class="reminder-card">
-                <div class="reminder-label">Order attention</div>
+                <div class="reminder-label">{{ __('Order attention') }}</div>
                 <div class="reminder-title">
                     {{ $pendingOrders }} paid {{ \Illuminate\Support\Str::plural('order', $pendingOrders) }} ready for processing
                 </div>
                 <div class="reminder-time">
                     Keep paid orders moving so customers receive their products on time.
                 </div>
-                <a href="{{ route('admin.order') }}" class="btn-start">Open Orders</a>
+                <a href="{{ route('admin.order') }}" class="btn-start">{{ __('Open Orders') }}</a>
             </div>
         </div>
     </div>
 
     <div class="panel">
         <div class="panel-header">
-            <h2 class="panel-title">Top Products</h2>
+            <h2 class="panel-title">{{ __('Top Products') }}</h2>
             <a href="{{ route('product.create') }}" class="panel-action-btn">+ New</a>
         </div>
         <div class="panel-body" style="padding-top:7px">
@@ -186,7 +186,7 @@
 
     <div class="panel">
         <div class="panel-header">
-            <h2 class="panel-title">Recent Orders</h2>
+            <h2 class="panel-title">{{ __('Recent Orders') }}</h2>
             <a href="{{ route('admin.order') }}" class="panel-action-btn">View all</a>
         </div>
         <div class="panel-body" style="padding-top:6px">
@@ -228,7 +228,7 @@
 
         <div class="panel">
             <div class="panel-header">
-                <h2 class="panel-title">Order Status</h2>
+                <h2 class="panel-title">{{ __('Order Status') }}</h2>
                 <span class="panel-badge">{{ $approvedOrders + $pendingOrders + $rejectedOrders }} tracked</span>
             </div>
             <div class="panel-body">
@@ -250,7 +250,7 @@
         </div>
 
         <div class="time-tracker">
-            <div class="tracker-label">Session Timer</div>
+            <div class="tracker-label">{{ __('Session Timer') }}</div>
             <div class="tracker-time" id="sessionTimer">00:00:00</div>
             <div class="tracker-controls">
                 <button class="tracker-btn pause" id="trackerToggle" type="button" onclick="toggleTimer()" aria-label="Pause timer">

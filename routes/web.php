@@ -25,6 +25,17 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UpdateProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/lang/{locale}', function ($locale) {
+    $normalized = in_array(strtolower($locale), ['kh', 'km', 'khmer', 'khmer_unicode']) 
+        ? 'khmer_unicode' 
+        : 'english';
+
+    session(['locale' => $normalized]);
+    app()->setLocale($normalized);
+
+    return redirect()->back();
+})->name('lang.switch');
+
 Route::get('/about', function () {
     return view('about');
 });

@@ -1,0 +1,60 @@
+<?php
+
+return [
+    // General
+    'home' => 'ទំព័រដើម',
+    'products' => 'ទំនិញ',
+    'categories' => 'ប្រភេទ',
+    'about_us' => 'អំពីយើង',
+    'contact_us' => 'ទាក់ទងយើង',
+    'cart' => 'កន្ត្រក',
+    'checkout' => 'ទូទាត់ប្រាក់',
+    'search' => 'ស្វែងរក',
+    'search_placeholder' => 'ស្វែងរកទំនិញ មុខម្ហូប...',
+    'language' => 'ភាសា',
+    'khmer' => 'ភាសាខ្មែរ',
+    'english' => 'អង់គ្លេស',
+    'dark_mode' => 'ទម្រង់ងងឹត',
+    'light_mode' => 'ទម្រង់ភ្លឺ',
+
+    // Auth & Profile
+    'login' => 'ចូលគណនី',
+    'register' => 'ចុះឈ្មោះ',
+    'logout' => 'ចាកចេញ',
+    'profile' => 'គណនីរបស់ខ្ញុំ',
+    'account_profile' => 'ព័ត៌មានគណនី',
+    'edit_profile' => 'កែប្រែព័ត៌មាន',
+    'order_history' => 'ប្រវត្តិនៃការបញ្ជាទិញ',
+    'track_shipments' => 'តាមដានការដឹកជញ្ជូន',
+    'saved_favorites' => 'ទំនិញពេញចិត្ត',
+    'notifications' => 'ការជូនដំណឹង',
+    'support_chat' => 'ជំនួយ និងការជជែក',
+    'courier_portal' => 'ផតថលអ្នកដឹកជញ្ជូន',
+    'admin_dashboard' => 'ផ្ទាំងគ្រប់គ្រង Admin',
+
+    // Product & Orders
+    'price' => 'តម្លៃ',
+    'quantity' => 'ចំនួន',
+    'total' => 'សរុប',
+    'subtotal' => 'សរុបបឋម',
+    'status' => 'ស្ថានភាព',
+    'actions' => 'សកម្មភាព',
+    'view' => 'មើល',
+    'edit' => 'កែប្រែ',
+    'delete' => 'លុប',
+    'save' => 'រក្សាទុក',
+    'cancel' => 'បោះបង់',
+    'filter_by_category' => 'ច្រោះតាមប្រភេទ',
+    'all_categories' => 'គ្រប់ប្រភេទទាំងអស់',
+    'no_products_found' => 'រកមិនឃើញទំនិញឡើយ',
+
+    // Backend
+    'dashboard' => 'ផ្ទាំងគ្រប់គ្រង',
+    'product_catalog' => 'កាតាឡុកទំនិញ',
+    'product_list' => 'បញ្ជីទំនិញ',
+    'create_product' => 'បន្ថែមទំនិញថ្មី',
+    'edit_product' => 'កែប្រែទំនិញ',
+    'promos' => 'ប្រូម៉ូសិន',
+    'orders' => 'ការបញ្ជាទិញ',
+    'users' => 'អ្នកប្រើប្រាស់',
+];

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8" />
@@ -32,7 +32,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================================
@@ -51,7 +53,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Kantumruy Pro', 'Battambang', system-ui, -apple-system, sans-serif;
             background: #fafafa;
             color: #1e293b;
         }
@@ -1016,6 +1018,16 @@
             border-color: #24344d;
         }
 
+        html[data-bs-theme="dark"] .lang-switcher-container,
+        html[data-theme="dark"] .lang-switcher-container {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        html[data-bs-theme="dark"] .lang-switcher-container span,
+        html[data-theme="dark"] .lang-switcher-container span {
+            color: #cbd5e1 !important;
+        }
+
         html[data-bs-theme="dark"] .dropdown-mega-menu,
         html[data-theme="dark"] .dropdown-mega-menu {
             background-color: #131c2e;
@@ -1594,12 +1606,113 @@
         html[data-theme="dark"] .swal2-toast .swal2-close {
             color: #94a3b8 !important;
         }
+
+        /* =========================================================
+           RECTANGULAR LANGUAGE SWITCHER (EN / KH)
+        ========================================================= */
+        .lang-switch-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            padding: 0 11px;
+            border: 1.5px solid #0f172a;
+            border-radius: 4px;
+            background: #ffffff;
+            color: #0f172a;
+            font-family: 'Times New Roman', Times, Georgia, serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+            user-select: none;
+            transition: all .18s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }
+        .lang-switch-box:hover {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #000000;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(15, 23, 42, 0.1);
+        }
+        .lang-switch-box:active {
+            transform: translateY(0);
+        }
+        .lang-switch-box .lang-code {
+            display: inline-block;
+            transition: opacity .18s ease, color .18s ease;
+        }
+        .lang-switch-box .lang-code.active {
+            opacity: 1;
+            font-weight: 800;
+        }
+        .lang-switch-box .lang-code.dim {
+            opacity: 0.45;
+            font-weight: 700;
+        }
+        .lang-switch-box .lang-sep {
+            margin: 0 5px;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+
+        /* Dark Mode adaptation for EN / KH box (Frontend) */
+        html[data-bs-theme="dark"] .lang-switch-box,
+        html[data-theme="dark"] .lang-switch-box {
+            background: #131c2e;
+            border-color: #cbd5e1;
+            color: #f8fafc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        html[data-bs-theme="dark"] .lang-switch-box:hover,
+        html[data-theme="dark"] .lang-switch-box:hover {
+            background: #1e293b;
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-code.active,
+        html[data-theme="dark"] .lang-switch-box .lang-code.active {
+            opacity: 1;
+            color: #ffffff;
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-code.dim,
+        html[data-theme="dark"] .lang-switch-box .lang-code.dim {
+            opacity: 0.45;
+            color: #94a3b8;
+        }
+        html[data-bs-theme="dark"] .lang-switch-box .lang-sep,
+        html[data-theme="dark"] .lang-switch-box .lang-sep {
+            opacity: 0.65;
+            color: #cbd5e1;
+        }
+
+        .lang-dropdown-item-wrap {
+            background: #f8fafc;
+        }
+        html[data-bs-theme="dark"] .lang-dropdown-item-wrap,
+        html[data-theme="dark"] .lang-dropdown-item-wrap {
+            background: #0e1726 !important;
+            border-color: #24344d !important;
+        }
+        html[data-bs-theme="dark"] .lang-dropdown-item-wrap .text-secondary,
+        html[data-theme="dark"] .lang-dropdown-item-wrap .text-secondary {
+            color: #cbd5e1 !important;
+        }
     </style>
 
     @stack('styles')
 </head>
 
 <body>
+    @php
+        $isKhmerFrontend = in_array(session('locale'), ['kh', 'km', 'khmer', 'khmer_unicode']) || in_array(app()->getLocale(), ['kh', 'km', 'khmer', 'khmer_unicode']);
+        $frontendTargetLocale = $isKhmerFrontend ? 'english' : 'khmer_unicode';
+        $frontendTooltip = $isKhmerFrontend ? 'Switch to English (EN)' : 'ប្តូរជាភាសាខ្មែរ (KH)';
+    @endphp
 
     <!-- =========================================================
          NAVBAR
@@ -1613,8 +1726,17 @@
                 <span style="font-weight: 800; font-size: 1.18rem; letter-spacing: -0.4px; color: var(--green-dark);">24/7 NHAM</span>
             </a>
 
-            <!-- MOBILE ACTIONS (THEME TOGGLE & BURGER) -->
+            <!-- MOBILE ACTIONS (LANGUAGE, THEME TOGGLE & BURGER) -->
             <div class="d-flex align-items-center gap-2 d-lg-none ms-auto me-1">
+                <a href="{{ route('lang.switch', $frontendTargetLocale) }}" 
+                   class="lang-switch-box text-decoration-none d-inline-flex align-items-center justify-content-center" 
+                   style="height: 34px; padding: 0 9px; font-size: 13px;"
+                   title="{{ $frontendTooltip }}"
+                   aria-label="{{ $frontendTooltip }}">
+                    <span class="lang-code {{ !$isKhmerFrontend ? 'active' : 'dim' }}">EN</span>
+                    <span class="lang-sep">/</span>
+                    <span class="lang-code {{ $isKhmerFrontend ? 'active' : 'dim' }}">KH</span>
+                </a>
                 <button type="button" 
                         class="btn btn-outline-secondary btn-sm rounded-3 p-1 theme-toggle-btn d-flex align-items-center justify-content-center" 
                         id="mobileThemeToggleBtn"
@@ -1637,20 +1759,20 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('/') ? 'active' : '' }}"
                             href="{{ url('/') }}">
-                            Home
+                            {{ __('Home') }}
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('list') ? 'active' : '' }}" href="{{ url('/list') }}">
-                            Products
+                            {{ __('Products') }}
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('frontend*') ? 'active' : '' }}"
                             href="{{ url('/frontend') }}">
-                            Categories
+                            {{ __('Categories') }}
                         </a>
                     </li>
 
@@ -1662,7 +1784,7 @@
                            data-bs-toggle="dropdown" 
                            data-bs-display="static" 
                            aria-expanded="false">
-                            <span>Shop</span>
+                            <span>{{ __('Shop') }}</span>
                             <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-1 py-0 ms-1 fw-bold" style="font-size: 0.65rem;"></span>
                         </a>
                         <div class="dropdown-menu dropdown-mega-menu shadow-lg border-0" aria-labelledby="shopMegaDropdown">
@@ -1903,10 +2025,10 @@
                             <div class="navbar-search">
                                 <i class="bi bi-search navbar-search-icon"></i>
                                 <input type="text" name="title" id="navbarSearchInput" class="navbar-search-input"
-                                    value="{{ request('keyword', $keyword ?? '') }}" placeholder="Search product title..."
+                                    value="{{ request('keyword', $keyword ?? '') }}" placeholder="{{ __('Search product title...') }}"
                                     autocomplete="off">
                                 <button type="submit" class="navbar-search-button">
-                                    Search
+                                    {{ __('Search') }}
                                 </button>
                             </div>
                         </form>
@@ -1918,7 +2040,7 @@
                     <!-- CART -->
                     <a href="{{ route('cart') }}" class="cart-btn">
                         <i class="bi bi-cart-fill"></i>
-                        Cart
+                        {{ __('Cart') }}
                         @php $cartCount = count((array) session('cart')); @endphp
                         @if($cartCount > 0)
                             <span class="cart-count">{{ $cartCount }}</span>
@@ -1940,6 +2062,19 @@
                         </a>
                     @endauth
 
+                    <!-- LANGUAGE SWITCHER (EN / KH) DESKTOP FOR GUESTS -->
+                    @guest
+                    <a href="{{ route('lang.switch', $frontendTargetLocale) }}" 
+                       class="lang-switch-box text-decoration-none d-none d-lg-inline-flex" 
+                       id="desktopLangToggleBtn"
+                       title="{{ $frontendTooltip }}"
+                       aria-label="{{ $frontendTooltip }}">
+                        <span class="lang-code {{ !$isKhmerFrontend ? 'active' : 'dim' }}">EN</span>
+                        <span class="lang-sep">/</span>
+                        <span class="lang-code {{ $isKhmerFrontend ? 'active' : 'dim' }}">KH</span>
+                    </a>
+                    @endguest
+
                     <!-- THEME TOGGLE (LIGHT / DARK) DESKTOP -->
                     <button type="button" 
                             class="btn btn-outline-secondary d-none d-lg-flex align-items-center justify-content-center rounded-3 p-2 theme-toggle-btn" 
@@ -1954,25 +2089,26 @@
                     <!-- LOGIN / LOGOUT -->
                     @guest
                         <a href="{{ route('login') }}" class="btn-nav-login">
-                            Login
+                            {{ __('Login') }}
                         </a>
                     @else
                         <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 rounded-3 py-1 px-2 px-md-3" 
-                                    type="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: .84rem; font-weight: 600;">
-                                @if(auth()->user()->avatar)
-                                    <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle object-fit-cover border" style="width: 24px; height: 24px;">
-                                @else
-                                    <i class="bi bi-person-circle text-success fs-6"></i>
-                                @endif
-                                <span class="d-none d-md-inline text-dark">{{ auth()->user()->name }}</span>
+                            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1 rounded-3 py-1 ps-1 pe-2" 
+                                    type="button" 
+                                    id="navProfileDropdown"
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false" 
+                                    style="height: 38px;"
+                                    title="{{ auth()->user()->name }}"
+                                    aria-label="User profile menu">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle object-fit-cover border" style="width: 26px; height: 26px;">
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 p-2" style="min-width: 220px;">
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 p-2" aria-labelledby="navProfileDropdown" style="min-width: 230px;">
                                 <li class="px-3 py-2 border-bottom mb-1">
                                     <div class="d-flex align-items-center gap-2">
                                         <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="rounded-circle border object-fit-cover" style="width: 36px; height: 36px;">
                                         <div style="min-width: 0;">
-                                            <div class="fw-bold text-dark small text-truncate">{{ auth()->user()->name }}</div>
+                                            <div class="fw-bold small text-truncate">{{ auth()->user()->name }}</div>
                                             <div class="text-muted text-truncate" style="font-size: .72rem;">{{ auth()->user()->email }}</div>
                                         </div>
                                     </div>
@@ -1980,54 +2116,72 @@
                                 @if(auth()->user()->isDriver())
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2 fw-semibold text-success bg-success-subtle mb-1" href="{{ route('driver.dashboard') }}">
-                                        <i class="bi bi-bicycle me-2 text-success"></i> Courier Portal
+                                        <i class="bi bi-bicycle me-2 text-success"></i> {{ __('Courier Portal') }}
                                     </a>
                                 </li>
                                 @endif
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('customer.orders.index') }}">
-                                        <i class="bi bi-clock-history me-2 text-primary"></i> My Order History
+                                        <i class="bi bi-clock-history me-2 text-primary"></i> {{ __('My Order History') }}
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('order.track') }}">
-                                        <i class="bi bi-truck me-2 text-success"></i> Track Shipments
+                                        <i class="bi bi-truck me-2 text-success"></i> {{ __('Track Shipments') }}
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('favorites.index') }}">
-                                        <i class="bi bi-heart me-2 text-danger"></i> Saved Favorites
+                                        <i class="bi bi-heart me-2 text-danger"></i> {{ __('Saved Favorites') }}
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('notifications.index') }}">
-                                        <i class="bi bi-bell me-2 text-secondary"></i> Notifications
+                                        <i class="bi bi-bell me-2 text-secondary"></i> {{ __('Notifications') }}
                                     </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('support.chat') }}">
-                                        <i class="bi bi-headset me-2 text-info"></i> Support & Chat
+                                        <i class="bi bi-headset me-2 text-info"></i> {{ __('Support & Chat') }}
                                     </a>
                                 </li>
-                                @if(auth()->user()->role === 'admin')
+                                @if((auth()->user()->role ?? '') === 'admin')
                                 <li>
                                     <a class="dropdown-item py-2 rounded-2" href="{{ route('dashboard') }}">
-                                        <i class="bi bi-speedometer2 me-2 text-warning"></i> Admin Dashboard
+                                        <i class="bi bi-speedometer2 me-2 text-warning"></i> {{ __('Admin Dashboard') }}
                                     </a>
                                 </li>
                                 @endif
                                 <li>
-                                    <a class="dropdown-item py-2 rounded-2" href="{{ route('profile.edit', auth()->id()) }}">
-                                        <i class="bi bi-gear me-2 text-secondary"></i> Account Profile
+                                    <a class="dropdown-item py-2 rounded-2" href="{{ auth()->id() ? route('profile.edit', auth()->id()) : route('login') }}">
+                                        <i class="bi bi-gear me-2 text-secondary"></i> {{ __('Account Profile') }}
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider my-1"></li>
+                                <!-- LANGUAGE SWITCHER (EN / KH) IN PROFILE DROPDOWN -->
+                                <li class="px-2 py-1">
+                                    <div class="d-flex align-items-center justify-content-between p-2 rounded-2 border lang-dropdown-item-wrap">
+                                        <span class="small fw-semibold text-secondary d-flex align-items-center">
+                                            <i class="bi bi-translate text-primary me-2 fs-6"></i>
+                                            <span>{{ __('Language') }}</span>
+                                        </span>
+                                        <a href="{{ route('lang.switch', $frontendTargetLocale) }}" 
+                                           class="lang-switch-box text-decoration-none d-inline-flex align-items-center justify-content-center" 
+                                           style="height: 30px; padding: 0 10px; font-size: 13px;"
+                                           title="{{ $frontendTooltip }}"
+                                           aria-label="{{ $frontendTooltip }}">
+                                            <span class="lang-code {{ !$isKhmerFrontend ? 'active' : 'dim' }}">EN</span>
+                                            <span class="lang-sep">/</span>
+                                            <span class="lang-code {{ $isKhmerFrontend ? 'active' : 'dim' }}">KH</span>
+                                        </a>
+                                    </div>
+                                </li>
                                 <li>
                                     <button type="button" class="dropdown-item py-2 rounded-2 theme-toggle-btn d-flex align-items-center justify-content-between border-0 bg-transparent w-100">
                                         <span>
                                             <i class="bi bi-moon-stars-fill text-warning me-2 theme-icon-dark"></i>
                                             <i class="bi bi-sun-fill text-warning me-2 theme-icon-light"></i>
-                                            <span class="theme-dropdown-label">Dark Mode</span>
+                                            <span class="theme-dropdown-label">{{ __('Dark Mode') }}</span>
                                         </span>
                                         <span class="badge bg-secondary-subtle text-secondary rounded-pill small theme-dropdown-badge" style="font-size: 0.68rem;">Theme</span>
                                     </button>
@@ -2036,7 +2190,7 @@
                                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                                         @csrf
                                         <button type="submit" class="dropdown-item py-2 rounded-2 text-danger border-0 bg-transparent w-100 text-start">
-                                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                            <i class="bi bi-box-arrow-right me-2"></i> {{ __('Logout') }}
                                         </button>
                                     </form>
                                 </li>
@@ -2056,8 +2210,17 @@
         <div class="alert alert-success alert-dismissible fade show mb-0 rounded-0" role="alert">
             <div class="container">
                 <i class="fas fa-check-circle me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                {{ is_array(session('success')) ? implode(', ', session('success')) : session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-0 rounded-0" role="alert">
+            <div class="container">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                {{ is_array(session('error')) ? implode(', ', session('error')) : session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     @endif
@@ -2121,19 +2284,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @if(session('success'))
+    @php
+        $flashSuccess = session('success');
+        if (is_array($flashSuccess)) {
+            $flashSuccess = implode(', ', $flashSuccess);
+        }
+        $flashError = session('error');
+        if (is_array($flashError)) {
+            $flashError = implode(', ', $flashError);
+        }
+        $flashErrors = (isset($errors) && $errors->any()) ? implode('<br>', $errors->all()) : null;
+    @endphp
+
+    @if($flashSuccess || $flashError || $flashErrors)
+    <div id="appFlashNotice" 
+         class="d-none"
+         data-success="{{ $flashSuccess ? e($flashSuccess) : '' }}"
+         data-error="{{ $flashError ? e($flashError) : '' }}"
+         data-errors="{{ $flashErrors ? e($flashErrors) : '' }}"></div>
     <script>
-        Swal.fire({toast:true, position:'top-end', icon:'success', title:@json(session('success')), showConfirmButton:false, timer:2600, timerProgressBar:true});
-    </script>
-    @endif
-    @if(session('error'))
-    <script>
-        Swal.fire({toast:true, position:'top-end', icon:'error', title:@json(session('error')), showConfirmButton:false, timer:3200, timerProgressBar:true});
-    </script>
-    @endif
-    @if($errors->any())
-    <script>
-        Swal.fire({icon:'error', title:'Please check the form', html:@json(implode('<br>', $errors->all()))});
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof Swal === 'undefined') return;
+            const noticeEl = document.getElementById('appFlashNotice');
+            if (!noticeEl) return;
+            const successText = noticeEl.getAttribute('data-success');
+            const errorText = noticeEl.getAttribute('data-error');
+            const validationErrors = noticeEl.getAttribute('data-errors');
+
+            if (successText) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: successText,
+                    showConfirmButton: false,
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            } else if (errorText) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errorText,
+                    showConfirmButton: false,
+                    timer: 3200,
+                    timerProgressBar: true
+                });
+            }
+
+            if (validationErrors) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Please check the form',
+                    html: validationErrors
+                });
+            }
+        });
     </script>
     @endif
 
