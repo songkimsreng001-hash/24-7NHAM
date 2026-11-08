@@ -51,7 +51,7 @@ return [
             'port' => env('DB_PORT', '4000'),
             'database' => env('DB_DATABASE', 'nham'),
             'username' => env('DB_USERNAME', '3GKrgfbNYT24SsU.root'),
-            'password' => env('DB_PASSWORD', ''),
+            'password' => env('DB_PASSWORD', 'iVsIs2EbOK0Kx480'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
