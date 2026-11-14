@@ -16,7 +16,7 @@ echo "DB_PASSWORD_HINT: " . substr($pass, 0, 3) . '***' . substr($pass, -3) . "\
 echo "\n--- Testing PDO Connection from Vercel ---\n";
 try {
     $caFunction = function () {
-        $ca = env('MYSQL_ATTR_SSL_CA');
+        $ca = getenv('MYSQL_ATTR_SSL_CA');
         if ($ca && file_exists($ca)) return $ca;
         foreach ([
             '/etc/pki/tls/certs/ca-bundle.crt',
