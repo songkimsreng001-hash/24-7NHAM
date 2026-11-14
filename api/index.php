@@ -1,13 +1,10 @@
 <?php
 
-ini_set('display_errors', '1');
-error_reporting(E_ALL);
-
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Ensure required storage directories exist in /tmp
+// Ensure required storage directories exist in /tmp on Vercel Serverless
 $dirs = [
     '/tmp/storage/app',
     '/tmp/storage/app/public',
@@ -39,7 +36,5 @@ try {
 } catch (\Throwable $e) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
-    echo "Serverless Execution Error: " . $e->getMessage() . "\n";
-    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
-    echo "Stack Trace:\n" . $e->getTraceAsString();
+    echo "Application Error: " . $e->getMessage() . "\n";
 }
