@@ -27,16 +27,23 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
+    "APP_DEBUG": "true",
+    "APP_KEY": "base64:zEL0FTe3UhYP6rx8UjiBWnukytLBlZoShHxtDgu/ynw=",
+    "DB_CONNECTION": "mysql",
+    "DB_HOST": "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
+    "DB_PORT": "4000",
+    "DB_DATABASE": "nham",
+    "DB_USERNAME": "3GKrgfbNYT24SsU.root",
+    "DB_PASSWORD": "iVsIs2EbOK0Kx480",
+    "MYSQL_ATTR_SSL_CA": "/etc/ssl/certs/ca-certificates.crt",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
     "APP_ROUTES_CACHE": "/tmp/routes.php",
     "APP_SERVICES_CACHE": "/tmp/services.php",
-    "VIEW_COMPILED_PATH": "/tmp",
+    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
     "CACHE_STORE": "array",
     "SESSION_DRIVER": "cookie",
-    "LOG_CHANNEL": "stderr",
-    "MYSQL_ATTR_SSL_CA": "/etc/ssl/certs/ca-certificates.crt"
+    "LOG_CHANNEL": "stderr"
   }
 }
