@@ -52,6 +52,11 @@ try {
     $kernel->bootstrap();
 
     echo "\n--- Testing Laravel DB Connection ---\n";
+    $mysqlConf = config('database.connections.mysql');
+    unset($mysqlConf['password']); // don't leak full pass, print len instead
+    $mysqlConf['password_len'] = strlen(config('database.connections.mysql.password'));
+    print_r($mysqlConf);
+
     $cats = \Illuminate\Support\Facades\DB::select('SELECT COUNT(*) as cnt FROM categories');
     echo "Laravel DB Success! Category count: " . $cats[0]->cnt . "\n";
 } catch (Exception $e) {
