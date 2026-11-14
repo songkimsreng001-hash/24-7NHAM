@@ -44,9 +44,11 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') ? rtrim(env('APP_URL'), '/') . '/api/auth/google/callback' : 'http://127.0.0.1:8000/api/auth/google/callback'),
         'guzzle' => [
-            'verify' => file_exists(base_path('storage/cacert.pem'))
-                ? base_path('storage/cacert.pem')
-                : (file_exists('D:/php/cacert.pem') ? 'D:/php/cacert.pem' : false),
+            'verify' => file_exists('/etc/ssl/certs/ca-certificates.crt')
+                ? '/etc/ssl/certs/ca-certificates.crt'
+                : (file_exists(base_path('storage/cacert.pem'))
+                    ? base_path('storage/cacert.pem')
+                    : (file_exists('D:/php/cacert.pem') ? 'D:/php/cacert.pem' : false)),
             'timeout' => 20,
         ],
     ],
