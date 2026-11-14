@@ -1,5 +1,9 @@
 <?php
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+
 header('Content-Type: text/plain; charset=utf-8');
+echo "HELLO FROM DIAG\n";
 echo "PHP Version: " . PHP_VERSION . "\n";
 echo "Server Software: " . ($_SERVER['SERVER_SOFTWARE'] ?? 'unknown') . "\n";
 echo "Dir: " . __DIR__ . "\n";
