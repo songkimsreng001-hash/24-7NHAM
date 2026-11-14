@@ -4,9 +4,6 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Register autoload
-require __DIR__ . '/../vendor/autoload.php';
-
 // Ensure required storage directories exist in /tmp
 $dirs = [
     '/tmp/storage/app',
@@ -25,16 +22,21 @@ foreach ($dirs as $dir) {
     }
 }
 
-// Bootstrap Laravel
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+try {
+    // Register autoload
+    require __DIR__ . '/../vendor/autoload.php';
 
-// Fix read-only filesystem on Vercel Serverless
-$app->useStoragePath('/tmp/storage');
+    // Bootstrap Laravel
+    $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+    // Fix read-only filesystem on Vercel Serverless
+    $app->useStoragePath('/tmp/storage');
 
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
+    $app->handleRequest(Request::capture());
+} catch (\Throwable $e) {
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "Serverless Execution Error: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+    echo "Stack Trace:\n" . $e->getTraceAsString();
+}

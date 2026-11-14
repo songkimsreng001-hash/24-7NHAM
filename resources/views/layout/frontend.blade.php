@@ -2506,7 +2506,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const badge = document.getElementById('notifBadge');
             function checkUnreadNotifications() {
-                fetch('{{ route("notifications.unread") }}')
+                fetch('{{ route("notifications.unread", [], false) }}')
                     .then(r => r.json())
                     .then(data => {
                         if (badge) {

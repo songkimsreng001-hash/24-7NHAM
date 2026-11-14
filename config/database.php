@@ -60,9 +60,24 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_CA') ? false : null,
-            ], fn ($value) => !is_null($value) && $value !== '') : [],
+                PDO::MYSQL_ATTR_SSL_CA => (function () {
+                    $ca = env('MYSQL_ATTR_SSL_CA');
+                    if ($ca && file_exists($ca)) {
+                        return $ca;
+                    }
+                    foreach ([
+                        '/etc/pki/tls/certs/ca-bundle.crt',
+                        '/etc/ssl/certs/ca-bundle.crt',
+                        '/etc/ssl/certs/ca-certificates.crt',
+                    ] as $path) {
+                        if (file_exists($path)) {
+                            return $path;
+                        }
+                    }
+                    return $ca !== null ? '' : null;
+                })(),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            ], fn ($value) => !is_null($value)) : [],
         ],
 
         'mariadb' => [
