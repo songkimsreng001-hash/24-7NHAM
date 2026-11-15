@@ -1,5 +1,8 @@
 <?php
 
+// Normalizes SCRIPT_NAME on Vercel Serverless so Laravel doesn't treat /api as a base path
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
@@ -37,4 +40,6 @@ try {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     echo "Application Error: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n\n";
+    echo "Stack Trace:\n" . $e->getTraceAsString();
 }
