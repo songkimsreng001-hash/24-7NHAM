@@ -165,7 +165,7 @@
                                     <img id="currentImageDisplay" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="rounded shadow-sm" style="max-height: 140px; max-width: 100%; object-fit: contain;">
                                 </div>
                                 <div class="text-muted small mt-2 text-center text-truncate">
-                                    File: <code>{{ $product->image ?: 'default' }}</code>
+                                    File: <code>{{ str_starts_with($product->image, 'data:image') ? 'Uploaded image (cloud)' : ($product->image ?: 'default') }}</code>
                                 </div>
                             </div>
                         </div>

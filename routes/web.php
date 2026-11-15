@@ -48,6 +48,10 @@ Route::get('/post/{slug}', function ($slug = 'default-post') {
     return "Post Slug: $slug";
 });
 
+// Binary Image & Avatar Streaming Routes (Prevents Vercel FUNCTION_RESPONSE_PAYLOAD_TOO_LARGE)
+Route::get('/product-image/{id}', [ProductController::class, 'serveImage'])->name('product.image');
+Route::get('/user-avatar/{id}', [UpdateProfileController::class, 'serveAvatar'])->name('user.avatar');
+
 Route::get('/test', function () {
     $route = route('dashboard');
 

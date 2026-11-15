@@ -185,4 +185,54 @@ class UpdateProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profile updated successfully.');
     }
+
+    /**
+     * Serve user avatar directly as binary stream.
+     * Prevents large base64 strings from bloating HTML responses and causing Vercel FUNCTION_RESPONSE_PAYLOAD_TOO_LARGE.
+     */
+    public function serveAvatar($id)
+    {
+        $user = \App\Models\User::select('id', 'avatar', 'name', 'updated_at')->find($id);
+
+        if (! $user || ! $user->avatar) {
+            $name = $user ? $user->name : 'User';
+            return redirect('https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=3b82f6&color=ffffff&size=200');
+        }
+
+        if (str_starts_with($user->avatar, 'data:image')) {
+            $commaPos = strpos($user->avatar, ',');
+            if ($commaPos !== false) {
+                $header = substr($user->avatar, 0, $commaPos);
+                $data = substr($user->avatar, $commaPos + 1);
+
+                preg_match('/^data:([^;]+);base64/', $header, $matches);
+                $mime = $matches[1] ?? 'image/jpeg';
+                $binary = base64_decode($data);
+
+                if ($binary !== false) {
+                    $etag = '"' . md5($user->id . '_' . ($user->updated_at?->timestamp ?? '')) . '"';
+
+                    if (request()->header('If-None-Match') === $etag) {
+                        return response('', 304, [
+                            'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
+                            'ETag' => $etag,
+                        ]);
+                    }
+
+                    return response($binary, 200, [
+                        'Content-Type' => $mime,
+                        'Content-Length' => strlen($binary),
+                        'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
+                        'ETag' => $etag,
+                    ]);
+                }
+            }
+        }
+
+        if (str_starts_with($user->avatar, 'http://') || str_starts_with($user->avatar, 'https://')) {
+            return redirect($user->avatar);
+        }
+
+        return redirect(asset('img/avatars/' . $user->avatar));
+    }
 }

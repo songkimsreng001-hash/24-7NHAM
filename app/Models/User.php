@@ -129,8 +129,11 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if (! empty($this->avatar)) {
-            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://') || str_starts_with($this->avatar, 'data:image')) {
+            if (str_starts_with($this->avatar, 'http://') || str_starts_with($this->avatar, 'https://')) {
                 return $this->avatar;
+            }
+            if (str_starts_with($this->avatar, 'data:image')) {
+                return $this->id ? url('/user-avatar/'.$this->id) : $this->avatar;
             }
             if (file_exists(public_path('img/avatars/'.$this->avatar))) {
                 return asset('img/avatars/'.$this->avatar);

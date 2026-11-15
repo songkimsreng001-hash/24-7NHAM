@@ -508,7 +508,7 @@
                             <td style="padding-left:19px">
                                 <div style="display:flex;align-items:center;gap:9px">
                                     @if($product->image)
-                                        <img class="product-thumb" src="{{ asset('img/'.$product->image) }}" alt="{{ $product->name }}">
+                                        <img class="product-thumb" src="{{ $product->image_url }}" alt="{{ $product->name }}">
                                     @else
                                         <div class="product-thumb-placeholder">{{ strtoupper(substr($product->name,0,1)) }}</div>
                                     @endif

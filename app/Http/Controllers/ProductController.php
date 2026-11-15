@@ -150,6 +150,56 @@ class ProductController extends Controller
     }
 
     /**
+     * Serve a product's image directly as binary stream.
+     * Prevents large base64 strings from bloating HTML responses and causing Vercel FUNCTION_RESPONSE_PAYLOAD_TOO_LARGE.
+     */
+    public function serveImage($id)
+    {
+        $product = Product::select('id', 'image', 'updated_at')->find($id);
+
+        if (! $product || ! $product->image) {
+            return redirect(asset('img/logo.png'));
+        }
+
+        if (str_starts_with($product->image, 'data:image')) {
+            $commaPos = strpos($product->image, ',');
+            if ($commaPos !== false) {
+                $header = substr($product->image, 0, $commaPos);
+                $data = substr($product->image, $commaPos + 1);
+
+                preg_match('/^data:([^;]+);base64/', $header, $matches);
+                $mime = $matches[1] ?? 'image/jpeg';
+                $binary = base64_decode($data);
+
+                if ($binary !== false) {
+                    $etag = '"' . md5($product->id . '_' . ($product->updated_at?->timestamp ?? '')) . '"';
+
+                    if (request()->header('If-None-Match') === $etag) {
+                        return response('', 304, [
+                            'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
+                            'ETag' => $etag,
+                        ]);
+                    }
+
+                    return response($binary, 200, [
+                        'Content-Type' => $mime,
+                        'Content-Length' => strlen($binary),
+                        'Cache-Control' => 'public, max-age=86400, stale-while-revalidate=604800',
+                        'ETag' => $etag,
+                    ]);
+                }
+            }
+        }
+
+        if (str_starts_with($product->image, 'http://') || str_starts_with($product->image, 'https://')) {
+            return redirect($product->image);
+        }
+
+        $path = str_starts_with($product->image, 'img/') ? $product->image : 'img/' . $product->image;
+        return redirect(asset($path));
+    }
+
+    /**
      * Store uploaded image to public/img if writable, or as a Data URI on serverless environments.
      */
     protected function storeUploadedImage($uploadedFile): string
@@ -170,10 +220,68 @@ class ProductController extends Controller
         }
 
         // On Serverless platforms (e.g. Vercel) where filesystem is read-only:
-        // Convert to Base64 Data URI so it persists in the database without needing local disk writes
-        $mime = $uploadedFile->getMimeType() ?: 'image/jpeg';
-        $content = file_get_contents($uploadedFile->getRealPath());
+        // Optimize / compress image if GD is available, then convert to Base64 Data URI
+        return $this->optimizeAndEncodeImage($uploadedFile);
+    }
 
+    /**
+     * Compress/resize image before Base64 encoding to keep database storage small.
+     */
+    protected function optimizeAndEncodeImage($uploadedFile): string
+    {
+        $filePath = $uploadedFile->getRealPath();
+        $mime = $uploadedFile->getMimeType() ?: 'image/jpeg';
+
+        if (extension_loaded('gd') && function_exists('imagecreatefromstring')) {
+            try {
+                $content = file_get_contents($filePath);
+                $src = @imagecreatefromstring($content);
+                if ($src !== false) {
+                    $origWidth = imagesx($src);
+                    $origHeight = imagesy($src);
+
+                    $maxWidth = 800;
+                    $maxHeight = 800;
+
+                    $ratio = min($maxWidth / max(1, $origWidth), $maxHeight / max(1, $origHeight), 1.0);
+                    $newWidth = (int) round($origWidth * $ratio);
+                    $newHeight = (int) round($origHeight * $ratio);
+
+                    $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+                    imagealphablending($dst, false);
+                    imagesavealpha($dst, true);
+                    $transparent = imagecolorallocatealpha($dst, 255, 255, 255, 127);
+                    imagefilledrectangle($dst, 0, 0, $newWidth, $newHeight, $transparent);
+
+                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $origWidth, $origHeight);
+
+                    ob_start();
+                    if (function_exists('imagewebp')) {
+                        imagewebp($dst, null, 80);
+                        $mime = 'image/webp';
+                    } elseif (function_exists('imagejpeg')) {
+                        imagejpeg($dst, null, 80);
+                        $mime = 'image/jpeg';
+                    } elseif (function_exists('imagepng')) {
+                        imagepng($dst, null, 6);
+                        $mime = 'image/png';
+                    }
+                    $optimizedData = ob_get_clean();
+
+                    imagedestroy($src);
+                    imagedestroy($dst);
+
+                    if (! empty($optimizedData)) {
+                        return 'data:' . $mime . ';base64,' . base64_encode($optimizedData);
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fall back
+            }
+        }
+
+        $content = file_get_contents($filePath);
         return 'data:' . $mime . ';base64,' . base64_encode($content);
     }
 }
