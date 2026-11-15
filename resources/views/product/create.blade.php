@@ -190,12 +190,62 @@
         const imagePreview = document.getElementById('imagePreview');
         const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 
+        // Client-side image compression helper to make uploads fast and light
+        async function compressImageFile(file, maxWidth = 1000, quality = 0.82) {
+            return new Promise((resolve) => {
+                if (!file || !file.type.startsWith('image/')) return resolve(file);
+                if (file.size < 120 * 1024) return resolve(file);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let w = img.width, h = img.height;
+                        const ratio = Math.min(maxWidth / Math.max(1, w), maxWidth / Math.max(1, h), 1.0);
+                        w = Math.round(w * ratio);
+                        h = Math.round(h * ratio);
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        canvas.toBlob((blob) => {
+                            if (blob && blob.size < file.size) {
+                                const compFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(compFile);
+                            } else {
+                                resolve(file);
+                            }
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = () => resolve(file);
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => resolve(file);
+                reader.readAsDataURL(file);
+            });
+        }
+
         if (imageInput) {
-            imageInput.addEventListener('change', function () {
+            imageInput.addEventListener('change', async function () {
                 const [file] = this.files || [];
                 if (file) {
                     imagePreview.src = URL.createObjectURL(file);
                     imagePreviewContainer.classList.remove('d-none');
+
+                    // Compress large files in background to speed up form submission
+                    if (file.size > 120 * 1024 && window.DataTransfer) {
+                        try {
+                            const comp = await compressImageFile(file);
+                            const dt = new DataTransfer();
+                            dt.items.add(comp);
+                            imageInput.files = dt.files;
+                        } catch (err) {}
+                    }
                 } else {
                     imagePreview.src = '';
                     imagePreviewContainer.classList.add('d-none');

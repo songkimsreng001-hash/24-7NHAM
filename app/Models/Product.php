@@ -31,7 +31,16 @@ class Product extends Model
             return false;
         }
 
-        return $this->favorites()->where('user_id', $user->id)->exists();
+        // Cache the set of favorited product IDs on the User instance for this request lifecycle
+        // This eliminates up to 176 sequential N+1 database queries on product listing pages
+        if (! isset($user->_favorited_product_ids)) {
+            $user->_favorited_product_ids = \App\Models\Favorite::where('user_id', $user->id)
+                ->pluck('product_id')
+                ->flip()
+                ->toArray();
+        }
+
+        return isset($user->_favorited_product_ids[$this->id]);
     }
 
     public function getImageUrlAttribute(): string

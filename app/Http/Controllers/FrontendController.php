@@ -15,8 +15,8 @@ class FrontendController extends Controller
     public function index()
     {
         $categories = Category::all();
-        // Show all products on the home page
-        $products = Product::orderBy('created_at', 'DESC')->get();
+        // Show all products on the home page with eager loaded categories
+        $products = Product::with('category')->latest()->get();
 
         return view('frontend.index')
             ->with('products', $products)

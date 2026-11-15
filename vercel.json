@@ -2,11 +2,33 @@
   "version": 2,
   "framework": null,
   "outputDirectory": "public",
+  "regions": ["sin1"],
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.8.0"
+      "runtime": "vercel-php@0.8.0",
+      "regions": ["sin1"]
     }
   },
+  "headers": [
+    {
+      "source": "/(assets|css|img|js|storage|images|build)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(product-image|user-avatar)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/build/(.*)",
