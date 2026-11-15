@@ -57,21 +57,11 @@ class ProductController extends Controller
                 ->withErrors($validator);
         }
 
-        // Upload Product Image
-        $image = $request->file('image');
-        $uploadDir = public_path('img/');
-        if (!file_exists($uploadDir)) {
-            @mkdir($uploadDir, 0755, true);
-        }
-        $extension = $image->getClientOriginalExtension() ?: 'png';
-        $filename = time() . '_' . uniqid() . '.' . $extension;
-        $image->move($uploadDir, $filename);
-
         $product = new Product;
         $product->name = $request->input('name');
         $product->category_id = $request->input('category_id');
         $product->price = $request->input('price');
-        $product->image = $filename;
+        $product->image = $this->storeUploadedImage($request->file('image'));
         $product->description = $request->input('description');
         $product->save();
 
@@ -124,21 +114,12 @@ class ProductController extends Controller
 
         // Handle Image Replacement
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $uploadDir = public_path('img/');
-            if (!file_exists($uploadDir)) {
-                @mkdir($uploadDir, 0755, true);
-            }
-            $extension = $image->getClientOriginalExtension() ?: 'png';
-            $filename = time() . '_' . uniqid() . '.' . $extension;
-            $image->move($uploadDir, $filename);
-
-            // Clean up old image if exists locally
-            if ($product->image && file_exists(public_path('img/' . $product->image))) {
+            // Clean up old image if exists locally and is not a Data URI
+            if ($product->image && !str_starts_with($product->image, 'data:image') && file_exists(public_path('img/' . $product->image))) {
                 @unlink(public_path('img/' . $product->image));
             }
 
-            $product->image = $filename;
+            $product->image = $this->storeUploadedImage($request->file('image'));
         }
 
         $product->name = $request->input('name');
@@ -158,7 +139,7 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
-        if ($product->image && file_exists(public_path('img/' . $product->image))) {
+        if ($product->image && !str_starts_with($product->image, 'data:image') && file_exists(public_path('img/' . $product->image))) {
             @unlink(public_path('img/' . $product->image));
         }
         $name = $product->name;
@@ -166,5 +147,33 @@ class ProductController extends Controller
         Session::flash('product_delete', 'Product "' . $name . '" has been deleted.');
 
         return redirect()->route('product.index');
+    }
+
+    /**
+     * Store uploaded image to public/img if writable, or as a Data URI on serverless environments.
+     */
+    protected function storeUploadedImage($uploadedFile): string
+    {
+        $uploadDir = public_path('img/');
+
+        // If local public directory is writable (Local / VPS), save as file
+        if (@is_writable($uploadDir) || (!file_exists($uploadDir) && @mkdir($uploadDir, 0755, true) && @is_writable($uploadDir))) {
+            try {
+                $extension = strtolower($uploadedFile->getClientOriginalExtension() ?: 'png');
+                $filename = time() . '_' . uniqid() . '.' . $extension;
+                $uploadedFile->move($uploadDir, $filename);
+
+                return $filename;
+            } catch (\Throwable $e) {
+                // Fall back to Data URI if disk write fails
+            }
+        }
+
+        // On Serverless platforms (e.g. Vercel) where filesystem is read-only:
+        // Convert to Base64 Data URI so it persists in the database without needing local disk writes
+        $mime = $uploadedFile->getMimeType() ?: 'image/jpeg';
+        $content = file_get_contents($uploadedFile->getRealPath());
+
+        return 'data:' . $mime . ';base64,' . base64_encode($content);
     }
 }

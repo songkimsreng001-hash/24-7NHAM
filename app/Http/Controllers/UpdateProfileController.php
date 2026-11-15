@@ -125,47 +125,57 @@ class UpdateProfileController extends Controller
         // Handle profile photo upload (cropped data takes priority, then raw avatar file, then removal)
         if ($request->filled('cropped_avatar_data') && str_starts_with($request->cropped_avatar_data, 'data:image/')) {
             $data = $request->cropped_avatar_data;
-            if (preg_match('/^data:image\/(\w+);base64,/i', $data, $matches)) {
-                $ext = strtolower($matches[1]);
-                if ($ext === 'jpeg') {
-                    $ext = 'jpg';
-                }
-                if (in_array($ext, ['png', 'jpg', 'webp'], true)) {
-                    $base64 = substr($data, strpos($data, ',') + 1);
-                    $decoded = base64_decode($base64);
-                    if ($decoded !== false) {
-                        $destDir = public_path('img/avatars');
-                        if (! file_exists($destDir)) {
-                            @mkdir($destDir, 0755, true);
-                        }
-                        if ($user->avatar && file_exists(public_path('img/avatars/'.$user->avatar))) {
-                            @unlink(public_path('img/avatars/'.$user->avatar));
-                        }
-                        $filename = 'avatar_'.$user->id.'_'.time().'_'.uniqid().'.'.$ext;
-                        file_put_contents($destDir.'/'.$filename, $decoded);
-                        $user->avatar = $filename;
-                    }
-                }
-            }
-        } elseif ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $destDir = public_path('img/avatars');
-            if (! file_exists($destDir)) {
-                @mkdir($destDir, 0755, true);
-            }
-
-            // Clean up old local avatar if exists
-            if ($user->avatar && file_exists(public_path('img/avatars/'.$user->avatar))) {
+            if ($user->avatar && !str_starts_with($user->avatar, 'data:image') && file_exists(public_path('img/avatars/'.$user->avatar))) {
                 @unlink(public_path('img/avatars/'.$user->avatar));
             }
 
-            $ext = strtolower($file->getClientOriginalExtension()) ?: 'png';
-            $filename = 'avatar_'.$user->id.'_'.time().'_'.uniqid().'.'.$ext;
-            $file->move($destDir, $filename);
+            $destDir = public_path('img/avatars');
+            $saved = false;
+            if (@is_writable($destDir) || (!file_exists($destDir) && @mkdir($destDir, 0755, true) && @is_writable($destDir))) {
+                if (preg_match('/^data:image\/(\w+);base64,/i', $data, $matches)) {
+                    $ext = strtolower($matches[1]) === 'jpeg' ? 'jpg' : strtolower($matches[1]);
+                    $decoded = base64_decode(substr($data, strpos($data, ',') + 1));
+                    if ($decoded !== false) {
+                        $filename = 'avatar_'.$user->id.'_'.time().'_'.uniqid().'.'.$ext;
+                        if (@file_put_contents($destDir.'/'.$filename, $decoded) !== false) {
+                            $user->avatar = $filename;
+                            $saved = true;
+                        }
+                    }
+                }
+            }
 
-            $user->avatar = $filename;
+            // Fall back to direct Data URI on serverless platforms
+            if (! $saved) {
+                $user->avatar = $data;
+            }
+        } elseif ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            if ($user->avatar && !str_starts_with($user->avatar, 'data:image') && file_exists(public_path('img/avatars/'.$user->avatar))) {
+                @unlink(public_path('img/avatars/'.$user->avatar));
+            }
+
+            $destDir = public_path('img/avatars');
+            $saved = false;
+            if (@is_writable($destDir) || (!file_exists($destDir) && @mkdir($destDir, 0755, true) && @is_writable($destDir))) {
+                try {
+                    $ext = strtolower($file->getClientOriginalExtension()) ?: 'png';
+                    $filename = 'avatar_'.$user->id.'_'.time().'_'.uniqid().'.'.$ext;
+                    $file->move($destDir, $filename);
+                    $user->avatar = $filename;
+                    $saved = true;
+                } catch (\Throwable $e) {
+                    // Fall back to Data URI
+                }
+            }
+
+            // Fall back to Data URI on serverless platforms
+            if (! $saved) {
+                $mime = $file->getMimeType() ?: 'image/jpeg';
+                $user->avatar = 'data:'.$mime.';base64,'.base64_encode(file_get_contents($file->getRealPath()));
+            }
         } elseif ($request->boolean('remove_avatar')) {
-            if ($user->avatar && file_exists(public_path('img/avatars/'.$user->avatar))) {
+            if ($user->avatar && !str_starts_with($user->avatar, 'data:image') && file_exists(public_path('img/avatars/'.$user->avatar))) {
                 @unlink(public_path('img/avatars/'.$user->avatar));
             }
             $user->avatar = null;

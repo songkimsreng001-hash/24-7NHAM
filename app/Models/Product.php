@@ -39,7 +39,7 @@ class Product extends Model
         if (! $this->image) {
             return asset('img/logo.png');
         }
-        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://')) {
+        if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'data:image')) {
             return $this->image;
         }
         if (str_starts_with($this->image, 'img/')) {
