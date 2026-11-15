@@ -27,7 +27,7 @@
   ],
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
+    "APP_DEBUG": "true",
     "APP_KEY": "base64:zEL0FTe3UhYP6rx8UjiBWnukytLBlZoShHxtDgu/ynw=",
     "APP_URL": "https://24-7-nham.vercel.app",
     "APP_STORAGE": "/tmp/storage",

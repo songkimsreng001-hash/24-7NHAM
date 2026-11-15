@@ -23,7 +23,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->report(function (\Throwable $e) {
+            error_log(sprintf(
+                "\n\n==================== [ERROR REPORT] ====================\nURI: %s %s\nEXCEPTION: %s\nMESSAGE: %s\nLOCATION: %s:%d\n========================================================\n",
+                $_SERVER['REQUEST_METHOD'] ?? 'GET',
+                $_SERVER['REQUEST_URI'] ?? '/',
+                get_class($e),
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            ));
+        });
     })->create();
 
 if ($storagePath = env('APP_STORAGE')) {
