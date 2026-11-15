@@ -165,6 +165,7 @@
                     </div>
 
                     <!-- Action Button Group -->
+                    <div id="productCreateConfig" class="d-none" data-flash="{{ session('product_create') ?: session('success') }}"></div>
                     <div class="d-flex gap-2 pt-2 border-top">
                         <button type="submit" class="btn btn-primary px-4 shadow-sm" id="btnSubmit">
                             <i class="bi bi-check-lg me-1"></i>{{ __('Create Product') }}
@@ -254,7 +255,8 @@
         }
 
         // Flash Notification Toast
-        const flashCreate = <?php echo json_encode(session('product_create') ?: session('success'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        const configEl = document.getElementById('productCreateConfig');
+        const flashCreate = configEl ? configEl.getAttribute('data-flash') : '';
         if (flashCreate && typeof Swal !== 'undefined') {
             Swal.fire({
                 icon: 'success',

@@ -212,8 +212,9 @@
                     </div>
 
                     <!-- Action Buttons -->
+                    <div id="productEditConfig" class="d-none" data-product-name="{{ $product->name }}" data-flash="{{ session('product_update') ?: session('success') }}"></div>
                     <div class="d-flex flex-wrap gap-2 pt-2 border-top">
-                        <button type="button" class="btn btn-primary px-4 shadow-sm" id="btnSubmit">
+                        <button type="button" class="btn btn-primary px-4 shadow-sm" id="btnSubmit" data-product-name="{{ $product->name }}">
                             <i class="bi bi-check-lg me-1"></i>{{ __('Update') }}
                         </button>
                         <a class="btn btn-outline-info" href="{{ route('product.show', $product->id) }}">
@@ -338,7 +339,7 @@
                     return;
                 }
 
-                const currentProductName = <?php echo json_encode($product->name, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+                const currentProductName = btnSubmit.getAttribute('data-product-name') || 'this product';
 
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
@@ -364,7 +365,8 @@
         }
 
         // Flash Notification Toast
-        const flashUpdate = <?php echo json_encode(session('product_update') ?: session('success'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        const configEl = document.getElementById('productEditConfig');
+        const flashUpdate = configEl ? configEl.getAttribute('data-flash') : '';
         if (flashUpdate && typeof Swal !== 'undefined') {
             Swal.fire({
                 icon: 'success',

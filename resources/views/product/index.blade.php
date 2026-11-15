@@ -29,6 +29,7 @@
     </ol>
 
     <!-- Main Card -->
+    <div id="productFlashConfig" class="d-none" data-delete="{{ session('product_delete') }}" data-update="{{ session('product_update') }}" data-create="{{ session('product_create') }}"></div>
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
             <h5 class="mb-0 fw-semibold text-secondary">
@@ -427,11 +428,12 @@
         });
 
         // Flash Notification Toasts
-        const flashMessages = <?php echo json_encode([
-            'product_delete' => session('product_delete'),
-            'product_update' => session('product_update'),
-            'product_create' => session('product_create'),
-        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        const flashEl = document.getElementById('productFlashConfig');
+        const flashMessages = {
+            product_delete: flashEl ? flashEl.getAttribute('data-delete') : '',
+            product_update: flashEl ? flashEl.getAttribute('data-update') : '',
+            product_create: flashEl ? flashEl.getAttribute('data-create') : '',
+        };
 
         Object.entries(flashMessages).forEach(([key, message]) => {
             if (!message) return;
