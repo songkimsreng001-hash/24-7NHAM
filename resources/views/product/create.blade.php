@@ -253,19 +253,18 @@
             });
         }
 
-        // Trigger SweetAlert2 on Success Session Flash
-        @if(session('product_create'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    html: @json(session('product_create')),
-                    timer: 3000,
-                    timerProgressBar: true,
-                    showConfirmButton: false
-                });
-            }
-        @endif
+        // Flash Notification Toast
+        const flashCreate = <?php echo json_encode(session('product_create') ?: session('success'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        if (flashCreate && typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                html: flashCreate,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        }
     });
 </script>
 @endpush

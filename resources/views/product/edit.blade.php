@@ -165,7 +165,7 @@
                                     <img id="currentImageDisplay" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="rounded shadow-sm" style="max-height: 140px; max-width: 100%; object-fit: contain;">
                                 </div>
                                 <div class="text-muted small mt-2 text-center text-truncate">
-                                    File: <code>{{ str_starts_with($product->image, 'data:image') ? 'Uploaded image (cloud)' : ($product->image ?: 'default') }}</code>
+                                    File: <code>{{ (!empty($product->image) && str_starts_with($product->image, 'data:image')) ? 'Uploaded image (cloud)' : ($product->image ?: 'default') }}</code>
                                 </div>
                             </div>
                         </div>
@@ -338,10 +338,12 @@
                     return;
                 }
 
+                const currentProductName = <?php echo json_encode($product->name, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         title: 'Update Product?',
-                        text: 'Are you sure you want to save modifications for ' + @json($product->name) + '?',
+                        text: 'Are you sure you want to save modifications for ' + currentProductName + '?',
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#0d6efd',
@@ -354,39 +356,25 @@
                         }
                     });
                 } else {
-                    if (confirm('Are you sure you want to save modifications?')) {
+                    if (confirm('Are you sure you want to save modifications for ' + currentProductName + '?')) {
                         form.submit();
                     }
                 }
             });
         }
 
-        // Flash Messages via SweetAlert2
-        @if(session('product_update'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Updated!',
-                    html: @json(session('product_update')),
-                    timer: 3500,
-                    timerProgressBar: true,
-                    showConfirmButton: false
-                });
-            }
-        @endif
-
-        @if(session('product_create'))
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Created!',
-                    html: @json(session('product_create')),
-                    timer: 3500,
-                    timerProgressBar: true,
-                    showConfirmButton: false
-                });
-            }
-        @endif
+        // Flash Notification Toast
+        const flashUpdate = <?php echo json_encode(session('product_update') ?: session('success'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+        if (flashUpdate && typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated!',
+                html: flashUpdate,
+                timer: 3500,
+                timerProgressBar: true,
+                showConfirmButton: false
+            });
+        }
     });
 </script>
 @endpush
